@@ -1,7 +1,7 @@
 # Ubuntu Server Security Hardening Script
 
 ## Overview
-This repository contains a script designed to automate the process of security hardening for Ubuntu servers. The script implements a series of best practices and configurations to enhance the security posture of your Ubuntu server.
+This repository contains a script designed to automate the security hardening process for Ubuntu servers. The script is intended to be run initially on a fresh server installation before any additional software or configurations are applied. It  implements a series of best practices and configurations to enhance the security posture of your Ubuntu server.
 
 ## Features
 - Automatic installation and configuration of essential security tools.
