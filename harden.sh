@@ -46,7 +46,75 @@ update_system() {
     apt upgrade -y
     echo -e "${BLUE}System update and upgrade: ${GREEN}DONE${NC}"
     echo -e "${BLUE}System update and upgrade: ${GREEN}DONE${NC}" >> Report.txt
+    echo
 }
+
+
+# Function to disable non used accounts
+list_and_disable_non_used_accounts() {
+    echo -e "${BLUE}Making sure non-used accounts are disabled${NC}"
+    # List users with UID >= 1000
+    echo -e "${ORANGE}Users with accounts on this server: ${NC}"
+    awk -F: '$3 >= 1000 {print $1}' /etc/passwd
+
+    # Ask the user which account to keep
+    while true; do
+        read -p "${ORANGE}Enter the username of the account you want to keep: ${NC}" keep_account
+
+        # Validate if the entered username exists
+        if grep -q "^$keep_account:" /etc/passwd; then
+            break
+        else
+            echo "Error: The entered username '$keep_account' does not exist. Please try again."
+        fi
+    done
+
+    # Disable other accounts
+    disabled_users=""
+    while IFS= read -r user; do
+        if [ "$user" != "$keep_account" ]; then
+            if result=$(usermod --expiredate 1 "$user" 2>&1); then
+                if [[ "$result" == *"no changes"* ]]; then
+                    echo "Account '$user' is already disabled"
+                else
+                    if [[ "$result" == "" ]]; then
+                        echo "Account '$user' has been disabled."
+                        disabled_users+="$user "
+                    fi
+                fi
+            else
+                echo "Error disabling account '$user': $result"
+            fi
+        fi
+    done < <(awk -F: '$3 >= 1000 && $1 != "'"$keep_account"'" {print $1}' /etc/passwd)
+
+    echo -e "${BLUE}Disabling non-used accounts: ${GREEN}DONE${NC}"
+    echo
+    
+    # Append disabled users to the report
+    if [ -n "$disabled_users" ]; then
+        echo -e "${BLUE}Disabling non-used accounts: ${GREEN}DONE${NC} Following accounts were disabled: $disabled_users" >> Report.txt
+    else
+        if [[ "$result" == *"usermod: no changes"* ]]; then
+            echo -e "${BLUE}Disabling non-used accounts: ${GREEN}DONE${NC} No non-used accounts to disable." >> Report.txt
+        else
+            echo -e "${BLUE}Disabling non-used accounts: ${RED}FAILED${NC} $result" >> Report.txt
+        fi
+    fi
+}
+
+
+
+
+# SHH
+# IP TABLE
+# PORT SECURITY
+# FAIL2BAN
+# ROOTKITHUNTER
+# DISABLE COMPILERS
+# FILE PERMISSIONS
+# SECURE SHARED MEMORY
+# DISABLE ROOT LOGIN
 
 # Main function to run all tasks
 main() {
@@ -61,6 +129,10 @@ main() {
 
     # Update the system
     update_system
+
+    # Disable non-used accounts
+    list_and_disable_non_used_accounts
+
 
     # Add more tasks/functions as needed
 }
