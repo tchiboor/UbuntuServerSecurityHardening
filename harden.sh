@@ -22,11 +22,14 @@ install_dependencies() {
     echo -e "${BLUE}Installing dependencies: ${GREEN}DONE${NC}"
     echo
 }
+# Banner
+
 
 # Function to create report file
 create_report_file() {
     echo -e "${BLUE}Creating text file for the report${NC}"
     touch Report.txt
+    figlet "Hardening Report" >> Report.txt
     echo
     echo -e "${BLUE}Reporting file created: ${GREEN}DONE${NC}"
     echo
@@ -176,6 +179,7 @@ secure_tmp_folders() {
 
     echo -e "${BLUE}Securing /tmp and /var/tmp folders: ${GREEN}DONE${NC}"
     echo -e "${BLUE}Securing /tmp and /var/tmp folders: ${GREEN}DONE${NC}" >> Report.txt
+    echo
 }
 
 # IP TABLE
@@ -185,6 +189,7 @@ disable_telnet() {
     echo -e "${BLUE}Disabling Telnet Service${NC}"
     echo
     apt purge telnet telnetd inetutils-telnetd telnetd-ssl -y
+    echo -e "${BLUE}Disabling Telnet Service: ${GREEN}DONE${NC}"
     echo -e "${BLUE}Disabling Telnet Service: ${GREEN}DONE${NC}" >> Report.txt
     echo
 }
