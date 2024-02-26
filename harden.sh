@@ -109,9 +109,37 @@ list_and_disable_non_used_accounts() {
     fi
 }
 
+# Function to disable root login
+disable_root_login() {
+    echo -e "${BLUE}Disabling root login via SSH ${NC}"
 
+    # Open the SSH configuration file for editing
+    sshd_config="/etc/ssh/sshd_config"
 
+    # Check if the SSH configuration file exists
+    if [ ! -f "$sshd_config" ]; then
+        echo "SSH configuration file not found: $sshd_config"
+        return 1
+    fi
 
+    # Backup the original SSH configuration file
+    echo -e "Backing up original SSH configuration file$"
+    backup_file="$sshd_config.bak"
+    cp "$sshd_config" "$backup_file"
+    echo -e "Backup of SSH configuration file created: $backup_file"
+
+    # Modify the SSH configuration to disable root login
+    echo -e "Modifying configurations to disable root login"
+    sed -i 's/PermitRootLogin yes/PermitRootLogin no/' "$sshd_config"
+    
+    # Restart SSH service to apply changes
+    systemctl restart sshd
+    echo -e "SSH service restarted"
+
+    echo -e "${BLUE}Root login disabled in SSH configuration: ${GREEN}DONE${NC}"
+    echo -e "${BLUE}Root login disabled in SSH configuration: ${GREEN}DONE${NC}. You can now only log in as a regular user" >> Report.txt
+    echo
+}
 # SHH
 # IP TABLE
 # PORT SECURITY
@@ -138,6 +166,9 @@ main() {
 
     # Disable non-used accounts
     list_and_disable_non_used_accounts
+
+    # Disable root user
+    disable_root_login
 
 
     # Add more tasks/functions as needed
