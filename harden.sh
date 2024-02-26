@@ -29,7 +29,7 @@ install_dependencies() {
 create_report_file() {
     echo -e "${BLUE}Creating text file for the report${NC}"
     touch Report.txt
-    figlet "Hardening Report" >> Report.txt
+    figlet "Security Hardening Report" >> Report.txt
     echo
     echo -e "${BLUE}Reporting file created: ${GREEN}DONE${NC}"
     echo
