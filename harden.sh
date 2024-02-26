@@ -1,5 +1,11 @@
 #!/bin/bash
 
+# Check if the script is run as root
+if [[ $EUID -ne 0 ]]; then
+   echo -e "${RED}This script must be run as root.${NC}" 
+   exit 1
+fi
+
 # Define ANSI color codes
 RED='\033[0;31m'
 GREEN='\033[0;32m'
