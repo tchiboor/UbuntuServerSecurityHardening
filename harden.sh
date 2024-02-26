@@ -50,6 +50,8 @@ update_system() {
     sleep 3
     apt update
     apt upgrade -y
+    apt autoremove
+    apt autoclean
     echo -e "${BLUE}System update and upgrade: ${GREEN}DONE${NC}"
     echo -e "${BLUE}System update and upgrade: ${GREEN}DONE${NC}" >> Report.txt
     echo
@@ -140,9 +142,54 @@ disable_root_login() {
     echo -e "${BLUE}Root login disabled in SSH configuration: ${GREEN}DONE${NC}. You can now only log in as a regular user" >> Report.txt
     echo
 }
-# SHH
+
+# Function to secure /tmp and /var/tmp folders
+secure_tmp_folders() {
+    echo -e "${BLUE}Securing /tmp folder ${NC}"
+
+    # Create a 1 GB filesystem file for the /tmp partition
+    dd if=/dev/zero of=/usr/tmpDSK bs=1024 count=1024000
+
+    # Create a backup of the current /tmp folder
+    cp -Rpf /tmp /tmpbackup
+
+    # Mount the new /tmp partition and set the right permissions
+    mount -t tmpfs -o loop,noexec,nosuid,rw /usr/tmpDSK /tmp
+    chmod 1777 /tmp
+
+    # Copy the data from the backup folder and remove the backup folder
+    cp -Rpf /tmpbackup/* /tmp/
+    rm -rf /tmpbackup/*
+
+    # Set the /tmp in the fbtab
+    echo "/usr/tmpDSK /tmp tmpfs loop,nosuid,noexec,rw 0 0" >> /etc/fstab
+
+    # Test the fstab entry
+    mount -o remount /tmp
+
+    echo -e "${BLUE}Securing /var/tmp folder ${NC}"
+
+    # Securing the /var/tmp by creating a symbolic link to the /tmp folder we just created
+    mv /var/tmp /var/tmpold
+    ln -s /tmp /var/tmp
+    cp -prf /var/tmpold/* /tmp/
+
+    echo -e "${BLUE}Securing /tmp and /var/tmp folders: ${GREEN}DONE${NC}"
+    echo -e "${BLUE}Securing /tmp and /var/tmp folders: ${GREEN}DONE${NC}" >> Report.txt
+}
+
 # IP TABLE
 # PORT SECURITY
+# Function to disable telnet
+disable_telnet() {
+    echo -e "${BLUE}Disabling Telnet Service${NC}"
+    echo
+    apt purge telnet telnetd inetutils-telnetd telnetd-ssl -y
+    echo -e "${BLUE}Disabling Telnet Service: ${GREEN}DONE${NC}" >> Report.txt
+    echo
+}
+
+
 # FAIL2BAN
 # ROOTKITHUNTER
 # DISABLE COMPILERS
@@ -169,6 +216,12 @@ main() {
 
     # Disable root user
     disable_root_login
+
+    # Secure tmp folders
+    secure_tmp_folders
+
+    # Disable Telnet
+    disable_telnet
 
 
     # Add more tasks/functions as needed
