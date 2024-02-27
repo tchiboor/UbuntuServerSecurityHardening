@@ -194,14 +194,41 @@ disable_telnet() {
     echo
 }
 
+# Function to install fail2ban
+install_fail2ban() {
+    # Install fail2ban
+    echo -e "${BLUE}Installing fail2ban${NC}"
+    apt install -y fail2ban
 
-# FAIL2BAN
+    # Create a new configuration file for fail2ban
+    echo -e "Configuring fail2ban$"
+    tee /etc/fail2ban/jail.local > /dev/null <<EOF
+    [sshd]
+    enabled = true
+    port = 22
+    filter = sshd
+    logpath = /var/log/auth.log
+    maxretry = 5
+EOF
+
+    # Restart fail2ban
+    echo "Restarting fail2ban..."
+    systemctl restart fail2ban
+
+    echo -e "${BLUE}Fail2ban installation and configuration: ${GREEN}DONE${NC}"
+    echo -e "${BLUE}Fail2ban installation and configuration: ${GREEN}DONE${NC}" >> Report.txt
+}
+
 # ROOTKITHUNTER
 # DISABLE COMPILERS
 # FILE PERMISSIONS
 # SECURE SHARED MEMORY
 # DISABLE ROOT LOGIN
 
+# Function to print the Report
+print_report()  {
+    cat Report.txt
+}
 # Main function to run all tasks
 main() {
     # Install dependencies
@@ -228,8 +255,15 @@ main() {
     # Disable Telnet
     disable_telnet
 
+    # Install fail2ban
+    install_fail2ban
+
 
     # Add more tasks/functions as needed
+
+
+    # Print report
+    print_report
 }
 
 # Run the main function
