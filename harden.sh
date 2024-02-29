@@ -17,13 +17,13 @@ NC='\033[0m' # No Color
 install_dependencies() {
     echo -e "${BLUE}Installing dependencies${NC}"
     sleep 3
-    apt install figlet -y
+    apt install -y figlet
+    echo
+    apt install -y fail2ban
     echo
     echo -e "${BLUE}Installing dependencies: ${GREEN}DONE${NC}"
     echo
 }
-# Banner
-
 
 # Function to create report file
 create_report_file() {
@@ -172,7 +172,7 @@ secure_tmp_folders() {
 
     echo -e "${BLUE}Securing /var/tmp folder ${NC}"
 
-    # Securing the /var/tmp by creating a symbolic link to the /tmp folder we just created
+    # Securing the /var/tmp
     mv /var/tmp /var/tmpold
     ln -s /tmp /var/tmp
     cp -prf /var/tmpold/* /tmp/
@@ -182,8 +182,6 @@ secure_tmp_folders() {
     echo
 }
 
-# IP TABLE
-# PORT SECURITY
 # Function to disable telnet
 disable_telnet() {
     echo -e "${BLUE}Disabling Telnet Service${NC}"
@@ -196,10 +194,6 @@ disable_telnet() {
 
 # Function to install fail2ban
 install_fail2ban() {
-    # Install fail2ban
-    echo -e "${BLUE}Installing fail2ban${NC}"
-    apt install -y fail2ban
-
     # Create a new configuration file for fail2ban
     echo -e "Configuring fail2ban$"
     tee /etc/fail2ban/jail.local > /dev/null <<EOF
@@ -219,6 +213,9 @@ EOF
     echo -e "${BLUE}Fail2ban installation and configuration: ${GREEN}DONE${NC}" >> Report.txt
 }
 
+
+# IP TABLE
+# PORT SECURITY
 # ROOTKITHUNTER
 # DISABLE COMPILERS
 # FILE PERMISSIONS
@@ -231,38 +228,15 @@ print_report()  {
 }
 # Main function to run all tasks
 main() {
-    # Install dependencies
     install_dependencies
-
-    # Create report file
     create_report_file
-
-    # Configure timezone
     configure_timezone
-
-    # Update the system
     update_system
-
-    # Disable non-used accounts
     list_and_disable_non_used_accounts
-
-    # Disable root user
     disable_root_login
-
-    # Secure tmp folders
     secure_tmp_folders
-
-    # Disable Telnet
     disable_telnet
-
-    # Install fail2ban
     install_fail2ban
-
-
-    # Add more tasks/functions as needed
-
-
-    # Print report
     print_report
 }
 
