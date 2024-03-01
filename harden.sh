@@ -6,12 +6,25 @@ if [[ $EUID -ne 0 ]]; then
    exit 1
 fi
 
+source .env
+
 # Define ANSI color codes
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[0;33m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
+
+# Function to create report file
+create_report_file() {
+    echo -e "${BLUE}Creating text file for the report${NC}"
+    touch Report.txt
+    figlet "Security Hardening Report" >> Report.txt
+    echo
+    echo -e "${BLUE}Reporting file created: ${GREEN}DONE${NC}"
+    echo
+}
+
 
 # Function to install dependencies
 install_dependencies() {
@@ -25,22 +38,12 @@ install_dependencies() {
     echo
 }
 
-# Function to create report file
-create_report_file() {
-    echo -e "${BLUE}Creating text file for the report${NC}"
-    touch Report.txt
-    figlet "Security Hardening Report" >> Report.txt
-    echo
-    echo -e "${BLUE}Reporting file created: ${GREEN}DONE${NC}"
-    echo
-}
-
 # Function to configure timezone
 configure_timezone() {
     echo -e "${BLUE}Configuring timezone${NC}"
     echo -e "${BLUE}Please select your timezone:${NC}"
     sleep 3
-    dpkg-reconfigure tzdata
+    timedatectl set-timezone "$Time_Zone"
     date
     echo -e "${BLUE}Configure timezone: ${GREEN}DONE${NC}"
     echo -e "${BLUE}Configure timezone: ${GREEN}DONE${NC}" >> Report.txt
