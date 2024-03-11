@@ -29,27 +29,3 @@ This repository contains a script designed to automate the security hardening pr
     ```
 
 3. Make the script executable:
-
-    ```
-    chmod +x harden.sh
-    ```
-
-4. Run the script with root privileges:
-
-    ```
-    sudo ./harden.sh
-    ```
-
-5. Follow the on-screen prompts to confirm actions and provide necessary inputs.
-
-6. Sit back and let the script automate the security hardening process for your Ubuntu server.
-
-## Disclaimer
-- **Use at your own risk:** While the script aims to improve the security of your server, there is no guarantee that it will cover all possible vulnerabilities or suit every environment. Always review the changes made by the script and ensure they align with your security requirements.
-- **Backup:** It's highly recommended to backup your server before running this script to mitigate any potential risks.
-
-## Contributing
-- Contributions, suggestions, and bug reports are welcome! If you encounter any issues or have ideas for improvements, feel free to open an issue or submit a pull request.
-
-## License
-This project is licensed under the [MIT License](LICENSE).
