@@ -64,8 +64,78 @@ update_system() {
 
 }
 
+# Function to secure /tmp and /var/tmp folders
+secure_tmp_folders() {
+    log "${BLUE}Securing /tmp folder ${NC}"
+
+    dd if=/dev/zero of=/usr/tmpDSK bs=1024 count=1024000 >> "$LOG_FILE" 2>&1
+    cp -Rpf /tmp /tmpbackup >> "$LOG_FILE" 2>&1
+
+    # Mount the new /tmp partition and set the right permissions
+    mount -t tmpfs -o loop,noexec,nosuid,rw /usr/tmpDSK /tmp >> "$LOG_FILE" 2>&1
+    chmod 1777 /tmp >> "$LOG_FILE" 2>&1
+
+    cp -Rpf /tmpbackup/* /tmp/ >> "$LOG_FILE" 2>&1
+    rm -rf /tmpbackup/* >> "$LOG_FILE" 2>&1
+
+    echo "/usr/tmpDSK /tmp tmpfs loop,nosuid,noexec,rw 0 0" >> /etc/fstab >> "$LOG_FILE" 2>&1
+    mount -o remount /tmp >> "$LOG_FILE" 2>&1
+
+    log "${BLUE}Securing /var/tmp folder ${NC}"
+
+    # Securing the /var/tmp
+    mv /var/tmp /var/tmpold >> "$LOG_FILE" 2>&1
+    ln -s /tmp /var/tmp >> "$LOG_FILE" 2>&1
+    cp -prf /var/tmpold/* /tmp/ >> "$LOG_FILE" 2>&1
+
+    log "${BLUE}Securing /tmp and /var/tmp folders: ${GREEN}DONE${NC}"
+    echo -e "${BLUE}Securing /tmp and /var/tmp folders: ${GREEN}DONE${NC}" >> report.txt
+}
+
+# Function to configure IP tables firewall
+
+configure_iptables_firewall() {
+    # Port 80 (HTTP) and Port 22 (SSH)
+    log "${BLUE}Configuring iptables firewall${NC}"
+    iptables -A INPUT -p tcp -m tcp --dport $HTTP_PORT -m state --state NEW,ESTABLISHED -j ACCEPT >> "$LOG_FILE" 2>&1
+    iptables -A INPUT -p tcp -m tcp --dport $SSH_PORT -m state --state NEW,ESTABLISHED -j ACCEPT >> "$LOG_FILE" 2>&1
+    iptables -A INPUT -i lo -j ACCEPT >> "$LOG_FILE" 2>&1
+    iptables -A INPUT -j DROP >> "$LOG_FILE" 2>&1
+    log "${BLUE}Configuring iptables firewall$: ${GREEN}DONE${NC}"
+    echo -e "${BLUE}Configuring iptables firewall$: ${GREEN}DONE${NC}" >> report.txt
+}
+
+# Function to disable telnet
+disable_telnet() {
+    log "${BLUE}Disabling Telnet Service${NC}"
+    apt purge telnet telnetd inetutils-telnetd telnetd-ssl -y >> "$LOG_FILE" 2>&1
+    log "${BLUE}Disabling Telnet Service: ${GREEN}DONE${NC}"
+    echo -e "${BLUE}Disabling Telnet Service: ${GREEN}DONE${NC}" >> Report.txt
+}
+
+
+
+
+# Function to notify all DONE
+finished_execution (){
+        log "${GREEN}All configurations DONE${NC}"
+        echo -e "${GREEN}All configurations DONE.${NC}" >> report.txt
+
+}
+
+# Function to print the Report
+print_report()  {
+    cat report.txt
+}
+
 # Execute functions
 install_dependencies
 create_report_file
 configure_timezone
 update_system
+secure_tmp_folders
+configure_iptables_firewall
+disable_telnet
+
+finished_execution
+print_report
