@@ -97,8 +97,11 @@ secure_tmp_folders() {
 configure_iptables_firewall() {
     # Port 80 (HTTP) and Port 22 (SSH)
     log "${BLUE}Configuring iptables firewall${NC}"
+
     iptables -A INPUT -p tcp -m tcp --dport $HTTP_PORT -m state --state NEW,ESTABLISHED -j ACCEPT >> "$LOG_FILE" 2>&1
     iptables -A INPUT -p tcp -m tcp --dport $SSH_PORT -m state --state NEW,ESTABLISHED -j ACCEPT >> "$LOG_FILE" 2>&1
+    iptables -A INPUT -p tcp -m tcp --dport $HTTPS_PORT -m state --state NEW,ESTABLISHED -j ACCEPT >> "$LOG_FILE" 2>&1
+
     iptables -A INPUT -i lo -j ACCEPT >> "$LOG_FILE" 2>&1
     iptables -A INPUT -j DROP >> "$LOG_FILE" 2>&1
     log "${BLUE}Configuring iptables firewall$: ${GREEN}DONE${NC}"
@@ -113,6 +116,28 @@ disable_telnet() {
     echo -e "${BLUE}Disabling Telnet Service: ${GREEN}DONE${NC}" >> Report.txt
 }
 
+# Function to configure fail2ban
+configure_fail2ban() {
+
+    # Create a new configuration file for fail2ban
+    log "Configuring fail2ban"
+    tee /etc/fail2ban/jail.local >> "$LOG_FILE" 2>&1 <<EOF
+    [sshd]
+    enabled = true
+    port = 22
+    filter = sshd
+    logpath = /var/log/auth.log
+    maxretry = 10
+    bantime = 6000
+EOF
+
+    # Restart fail2ban
+    log "Restarting fail2ban..."
+    systemctl restart fail2ban >> "$LOG_FILE" 2>&1
+
+    log "${BLUE}Fail2ban configuration: ${GREEN}DONE${NC}"
+    echo -e "${BLUE}Fail2ban configuration: ${GREEN}DONE${NC}" >> Report.txt
+}
 
 
 
@@ -136,6 +161,7 @@ update_system
 secure_tmp_folders
 configure_iptables_firewall
 disable_telnet
+configure_fail2ban
 
 finished_execution
 print_report
