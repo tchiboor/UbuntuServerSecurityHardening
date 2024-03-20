@@ -201,8 +201,46 @@ get_service_status(){
     echo -e "${BLUE}Get all services status: ${GREEN}DONE${NC}" >> report.txt
 }
 
+# Function to implement password policy
+password_policy() {
+    log "${BLUE}Configuring password policy. ${NC}"
+
+    # Configure stron password policy
+    local config_line="/lib/security/\$ISA/pam_cracklib.so retry=3 minlen=8 lcredit=-1 ucredit=-2 dcredit=-2 ocredit=-1"
+    local SYSTEM_AUTH_FILE="/etc/pam.d/system-auth"
+
+    # Check if the line already exists in the file
+    if grep -q "$config_line" "$SYSTEM_AUTH_FILE"; then
+        log "Strong password policy config already exists in $SYSTEM_AUTH_FILE. No changes needed."
+        return 0
+    fi
+
+    # Add configurations to the file
+    echo "$config_line" | sudo tee -a "$SYSTEM_AUTH_FILE" >> "$LOG_FILE" 2>&1
+
+    # Configure user to not use the last 3 passwords
+    local config_line1="auth        sufficient    pam_unix.so likeauth nullok"
+    local config_line2="password    sufficient    pam_unix.so remember=3"
+
+    # Define the file path
+    local COMMON_PASSWORD_FILE="/etc/pam.d/common-password"
+
+    # Check if the configuration already exist in the file
+    if grep -q "$config_line1" "$COMMON_PASSWORD_FILE" && grep -q "$config_line2" "$COMMON_PASSWORD_FILE"; then
+        log "Password reuse configuration already exist in $COMMON_PASSWORD_FILE. No changes needed."
+        return 0
+    fi
+
+    # Add configurations to the to the file
+    echo "$config_line1" | sudo tee -a "$COMMON_PASSWORD_FILE" >> "$LOG_FILE" 2>&1
+    echo "$config_line2" | sudo tee -a "$COMMON_PASSWORD_FILE" >> "$LOG_FILE" 2>&1
+
+    log "${BLUE}Configuring password policy: ${GREEN}DONE${NC}"
+    echo -e "${BLUE}Configuring password policy: ${GREEN}DONE${NC}" >> report.txt
+}
+
 # Function to notify all DONE
-finished_execution (){
+finished_execution() {
         log "${GREEN}All configurations DONE${NC}"
         echo -e "${GREEN}All configurations DONE.${NC}" >> report.txt
 
@@ -225,6 +263,7 @@ disable_telnet
 configure_fail2ban
 set_file_dir_permissions
 get_service_status
+password_policy
 
 finished_execution
 print_report
