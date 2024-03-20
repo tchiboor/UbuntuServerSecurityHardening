@@ -66,6 +66,7 @@ update_system() {
 
 # Function to add a weekly cron job for system and packages updates..
 system_update_weekly_cron_job() {
+    log "${BLUE}Configuring weekly cron job to update system and packages added.${NC}"
     # Cron job command
     local cron_command="apt update && apt upgrade -y && apt autoremove -y && apt autoclean" >> "$LOG_FILE" 2>&1
 
@@ -73,8 +74,8 @@ system_update_weekly_cron_job() {
     (crontab -l 2>/dev/null; echo "0 0 * * 0 $cron_command") | crontab - >> "$LOG_FILE" 2>&1
 
     # Notify user
-    log "${BLUE}Weekly cron job to update system and packages added:${GREEN}DONE{$NC}"
-    echo -e "${BLUE}Weekly cron job to update system and packages added:${GREEN}DONE{$NC}" >> report.txt
+    log "${BLUE}Weekly cron job to update system and packages added:${GREEN}DONE${NC}"
+    echo -e "${BLUE}Weekly cron job to update system and packages added:${GREEN}DONE${NC}" >> report.txt
 }
 
 # Function to secure /tmp and /var/tmp folders
@@ -126,14 +127,14 @@ disable_telnet() {
     log "${BLUE}Disabling Telnet Service${NC}"
     apt purge telnet telnetd inetutils-telnetd telnetd-ssl -y >> "$LOG_FILE" 2>&1
     log "${BLUE}Disabling Telnet Service: ${GREEN}DONE${NC}"
-    echo -e "${BLUE}Disabling Telnet Service: ${GREEN}DONE${NC}" >> Report.txt
+    echo -e "${BLUE}Disabling Telnet Service: ${GREEN}DONE${NC}" >> report.txt
 }
 
 # Function to configure fail2ban
 configure_fail2ban() {
 
     # Create a new configuration file for fail2ban
-    log "Configuring fail2ban"
+    log -e "${BLUE}Configuring fail2ban.${NC}"
     tee /etc/fail2ban/jail.local >> "$LOG_FILE" 2>&1 <<EOF
     [sshd]
     enabled = true
@@ -149,10 +150,56 @@ EOF
     systemctl restart fail2ban >> "$LOG_FILE" 2>&1
 
     log "${BLUE}Fail2ban configuration: ${GREEN}DONE${NC}"
-    echo -e "${BLUE}Fail2ban configuration: ${GREEN}DONE${NC}" >> Report.txt
+    echo -e "${BLUE}Fail2ban configuration: ${GREEN}DONE${NC}" >> report.txt
 }
 
+# Function to set ownership and permissions for cron-related files and directories
+set_file_dir_permissions() {
+    echo -e "${BLUE}Configuring files and directory permissions.${NC}"
+    
+    # Set ownership and permissions for /etc/crontab
+    chown root:root /etc/crontab >> "$LOG_FILE" 2>&1
+    chmod og-rwx /etc/crontab >> "$LOG_FILE" 2>&1
 
+    # Set ownership and permissions for /etc/cron.hourly
+    chown root:root /etc/cron.hourly >> "$LOG_FILE" 2>&1
+    chmod og-rwx /etc/cron.hourly >> "$LOG_FILE" 2>&1
+
+    # Set ownership and permissions for /etc/cron.daily
+    chown root:root /etc/cron.daily >> "$LOG_FILE" 2>&1
+    chmod og-rwx /etc/cron.daily >> "$LOG_FILE" 2>&1
+
+    # Set ownership and permissions for /etc/cron.weekly
+    chown root:root /etc/cron.weekly >> "$LOG_FILE" 2>&1
+    chmod og-rwx /etc/cron.weekly >> "$LOG_FILE" 2>&1
+
+    # Set ownership and permissions for /etc/cron.monthly
+    chown root:root /etc/cron.monthly >> "$LOG_FILE" 2>&1
+    chmod og-rwx /etc/cron.monthly >> "$LOG_FILE" 2>&1
+
+    # Set ownership and permissions for /etc/cron.d
+    log "`chown root:root /etc/cron.d`"
+    log "`chmod og-rwx /etc/cron.d`"
+
+    # Set User/Group Owner and Permission on “passwd” file
+    log "`chmod 644 /etc/passwd`"
+    log "`chown root:root /etc/passwd`"
+
+    # Set User/Group Owner and Permission on the “shadow” file
+    log "`chmod 600 /etc/shadow`"
+    log "`chown root:root /etc/shadow`"
+
+    log "${BLUE}Configuring files/dir permissions: ${GREEN}DONE${NC}"
+    echo -e "${BLUE}Configuring files/dir permissions: ${GREEN}DONE${NC}" >> report.txt
+}
+
+# Function to get service statust
+get_service_status(){
+    echo -e "${BLUE}Get all services status ${NC}"
+    log "`service --status-all`" >> all_services_status.txt
+    log "${BLUE}Get all services status: ${GREEN}DONE${NC}"
+    echo -e "${BLUE}Get all services status: ${GREEN}DONE${NC}" >> report.txt
+}
 
 # Function to notify all DONE
 finished_execution (){
@@ -176,6 +223,8 @@ secure_tmp_folders
 configure_iptables_firewall
 disable_telnet
 configure_fail2ban
+set_file_dir_permissions
+get_service_status
 
 finished_execution
 print_report
