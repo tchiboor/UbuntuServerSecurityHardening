@@ -16,14 +16,20 @@ NC='\033[0m' # No Color
 # Environment viriables
 source .env
 
-# Log file
-LOG_FILE="script.log"
-
 # Function to log messages to both stdout and the log file
 log() {
     local message="$1"
     echo -e "$message" | tee -a "$LOG_FILE"
     echo | tee -a "$LOG_FILE"
+}
+
+
+# Log file
+create_log_file() {
+    echo -e "${BLUE}Creating text file for the logs. ${NC}"
+    touch harden.log
+    LOG_FILE="harden.log"
+    echo -e "${BLUE}Creating text file for the logs: ${GREEN}DONE${NC} File name: $LOG_FILE"
 }
 
 # Function to install dependencies
@@ -41,6 +47,15 @@ create_report_file() {
     REPORT="report.txt"
     figlet "Security Hardening Report" >> report.txt
     log "${BLUE}Reporting file created: ${GREEN}DONE${NC}. File name: $REPORT"
+}
+
+# Function to set the hostname
+set_hostname() {
+    log "${BLUE}Configuring hostname. ${NC}"
+    hostnamectl set-hostname "$HOSTNAME" >> "$LOG_FILE" 2>&1
+    log "Hostname set to $HOSTNAME"
+    log "${BLUE}Configuring hostname: ${GREEN}DONE${NC}"
+    echo -e "${BLUE}Configuring hostname: ${GREEN}DONE${NC}" >> report.txt
 }
 
 # Function to configure timezone
@@ -249,11 +264,14 @@ finished_execution() {
 # Function to print the Report
 print_report()  {
     cat report.txt
+    echo `date`
 }
 
 # Execute functions
+create_log_file
 install_dependencies
 create_report_file
+set_hostname
 configure_timezone
 update_system
 system_update_weekly_cron_job
