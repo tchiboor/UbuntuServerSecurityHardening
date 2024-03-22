@@ -1,0 +1,5 @@
+# Function to print the Report
+print_report()  {
+    cat report.txt
+    echo `date`
+}

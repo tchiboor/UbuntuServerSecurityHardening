@@ -1,0 +1,8 @@
+# Function to create report file
+create_report_file() {
+    log "${BLUE}Creating text file for the report${NC}"
+    touch report.txt
+    REPORT="report.txt"
+    figlet "Security Hardening Report" >> report.txt
+    log "${BLUE}Reporting file created: ${GREEN}DONE${NC}. File name: $REPORT"
+}

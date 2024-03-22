@@ -1,0 +1,22 @@
+# Function to configure fail2ban
+configure_fail2ban() {
+
+    # Create a new configuration file for fail2ban
+    log -e "${BLUE}Configuring fail2ban.${NC}"
+    tee /etc/fail2ban/jail.local >> "$LOG_FILE" 2>&1 <<EOF
+    [sshd]
+    enabled = true
+    port = 22
+    filter = sshd
+    logpath = /var/log/auth.log
+    maxretry = 10
+    bantime = 6000
+EOF
+
+    # Restart fail2ban
+    log "Restarting fail2ban..."
+    systemctl restart fail2ban >> "$LOG_FILE" 2>&1
+
+    log "${BLUE}Fail2ban configuration: ${GREEN}DONE${NC}"
+    echo -e "${BLUE}Fail2ban configuration: ${GREEN}DONE${NC}" >> report.txt
+}

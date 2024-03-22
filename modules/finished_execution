@@ -1,0 +1,6 @@
+# Function to notify all DONE
+finished_execution() {
+        log "${GREEN}All configurations DONE${NC}"
+        echo -e "${GREEN}All configurations DONE.${NC}" >> report.txt
+
+}

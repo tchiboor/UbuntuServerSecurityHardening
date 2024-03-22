@@ -1,0 +1,7 @@
+# Log file
+create_log_file() {
+    echo -e "${BLUE}Creating text file for the logs. ${NC}"
+    touch harden.log
+    LOG_FILE="harden.log"
+    echo -e "${BLUE}Creating text file for the logs: ${GREEN}DONE${NC} File name: $LOG_FILE"
+}

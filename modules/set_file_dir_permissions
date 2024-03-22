@@ -1,0 +1,39 @@
+# Function to set ownership and permissions for cron-related files and directories
+set_file_dir_permissions() {
+    echo -e "${BLUE}Configuring files and directory permissions.${NC}"
+    
+    # Set ownership and permissions for /etc/crontab
+    chown root:root /etc/crontab >> "$LOG_FILE" 2>&1
+    chmod og-rwx /etc/crontab >> "$LOG_FILE" 2>&1
+
+    # Set ownership and permissions for /etc/cron.hourly
+    chown root:root /etc/cron.hourly >> "$LOG_FILE" 2>&1
+    chmod og-rwx /etc/cron.hourly >> "$LOG_FILE" 2>&1
+
+    # Set ownership and permissions for /etc/cron.daily
+    chown root:root /etc/cron.daily >> "$LOG_FILE" 2>&1
+    chmod og-rwx /etc/cron.daily >> "$LOG_FILE" 2>&1
+
+    # Set ownership and permissions for /etc/cron.weekly
+    chown root:root /etc/cron.weekly >> "$LOG_FILE" 2>&1
+    chmod og-rwx /etc/cron.weekly >> "$LOG_FILE" 2>&1
+
+    # Set ownership and permissions for /etc/cron.monthly
+    chown root:root /etc/cron.monthly >> "$LOG_FILE" 2>&1
+    chmod og-rwx /etc/cron.monthly >> "$LOG_FILE" 2>&1
+
+    # Set ownership and permissions for /etc/cron.d
+    log "`chown root:root /etc/cron.d`"
+    log "`chmod og-rwx /etc/cron.d`"
+
+    # Set User/Group Owner and Permission on “passwd” file
+    log "`chmod 644 /etc/passwd`"
+    log "`chown root:root /etc/passwd`"
+
+    # Set User/Group Owner and Permission on the “shadow” file
+    log "`chmod 600 /etc/shadow`"
+    log "`chown root:root /etc/shadow`"
+
+    log "${BLUE}Configuring files/dir permissions: ${GREEN}DONE${NC}"
+    echo -e "${BLUE}Configuring files/dir permissions: ${GREEN}DONE${NC}" >> report.txt
+}
