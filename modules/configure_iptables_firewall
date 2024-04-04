@@ -1,14 +1,19 @@
-# Function to configure IP tables firewall
+# Function to configure IP tables firewal
 configure_iptables_firewall() {
     # Port 80 (HTTP) and Port 22 (SSH)
     log "${BLUE}Configuring iptables firewall${NC}"
 
-    iptables -A INPUT -p tcp -m tcp --dport $HTTP_PORT -m state --state NEW,ESTABLISHED -j ACCEPT >> "$LOG_FILE" 2>&1
-    iptables -A INPUT -p tcp -m tcp --dport $SSH_PORT -m state --state NEW,ESTABLISHED -j ACCEPT >> "$LOG_FILE" 2>&1
-    iptables -A INPUT -p tcp -m tcp --dport $HTTPS_PORT -m state --state NEW,ESTABLISHED -j ACCEPT >> "$LOG_FILE" 2>&1
+    # Split the PORTS string into an array
+    IFS=',' read -ra PORTS_ARRAY <<< "$OPEN_PORTS"
+
+    # Loop through each port and configure iptables rules
+    for port in "${PORTS_ARRAY[@]}"; do
+        iptables -A INPUT -p tcp -m tcp --dport "$port" -m state --state NEW,ESTABLISHED -j ACCEPT >> "$LOG_FILE" 2>&1
+    done
 
     iptables -A INPUT -i lo -j ACCEPT >> "$LOG_FILE" 2>&1
     iptables -A INPUT -j DROP >> "$LOG_FILE" 2>&1
+
     log "${BLUE}Configuring iptables firewall$: ${GREEN}DONE${NC}"
     echo -e "${BLUE}Configuring iptables firewall$: ${GREEN}DONE${NC}" >> report.txt
 }

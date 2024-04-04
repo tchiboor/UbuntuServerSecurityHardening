@@ -4,5 +4,5 @@ set_hostname() {
     hostnamectl set-hostname "$HOSTNAME" >> "$LOG_FILE" 2>&1
     log "Hostname set to $HOSTNAME"
     log "${BLUE}Configuring hostname: ${GREEN}DONE${NC}"
-    echo -e "${BLUE}Configuring hostname: ${GREEN}DONE${NC}" >> report.txt
+    echo -e "${BLUE}Configuring hostname: ${GREEN}DONE${NC}" >> report.txt  
 }

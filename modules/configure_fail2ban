@@ -10,7 +10,7 @@ configure_fail2ban() {
     filter = sshd
     logpath = /var/log/auth.log
     maxretry = 10
-    bantime = 6000
+    bantime = 60m
 EOF
 
     # Restart fail2ban

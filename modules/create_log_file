@@ -1,7 +1,12 @@
 # Log file
 create_log_file() {
-    echo -e "${BLUE}Creating text file for the logs. ${NC}"
-    touch harden.log
-    LOG_FILE="harden.log"
-    echo -e "${BLUE}Creating text file for the logs: ${GREEN}DONE${NC} File name: $LOG_FILE"
+    echo -e "${BLUE}Creating text file for the logs.${NC}"
+    if touch harden.log 2> /dev/null; then
+        LOG_FILE="harden.log"
+        echo -e "${BLUE}Creating text file for the logs: ${GREEN}DONE${NC} File name: $LOG_FILE"
+    else
+        error_message=$(touch harden.log 2>&1 >/dev/null)
+        echo -e "${RED}Error: Failed to create log file. Reason: $error_message${NC}"
+        exit 1
+    fi
 }
