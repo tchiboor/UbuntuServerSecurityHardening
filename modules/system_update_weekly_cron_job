@@ -1,0 +1,13 @@
+# Function to add a weekly cron job for system and packages updates..
+system_update_weekly_cron_job() {
+    log "${BLUE}Configuring weekly cron job to update system and packages added.${NC}"
+    # Cron job command
+    local cron_command="apt update && apt upgrade -y && apt autoremove -y && apt autoclean" >> "$LOG_FILE" 2>&1
+
+    # Add the cron job to run weekly
+    (crontab -l 2>/dev/null; echo "0 0 * * 0 $cron_command") | crontab - >> "$LOG_FILE" 2>&1
+
+    # Notify user
+    log "${BLUE}Weekly cron job to update system and packages added:${GREEN}DONE${NC}"
+    echo -e "${BLUE}Weekly cron job to update system and packages added:${GREEN}DONE${NC}" >> report.txt
+}

@@ -1,0 +1,7 @@
+# Function to disable telnet
+disable_telnet() {
+    log "${BLUE}Disabling Telnet Service${NC}"
+    apt purge telnet telnetd inetutils-telnetd telnetd-ssl -y >> "$LOG_FILE" 2>&1
+    log "${BLUE}Disabling Telnet Service: ${GREEN}DONE${NC}"
+    echo -e "${BLUE}Disabling Telnet Service: ${GREEN}DONE${NC}" >> report.txt
+}

@@ -1,0 +1,27 @@
+# Function to secure /tmp and /var/tmp folders
+secure_tmp_folders() {
+    log "${BLUE}Securing /tmp folder ${NC}"
+
+    dd if=/dev/zero of=/usr/tmpDSK bs=1024 count=1024000 >> "$LOG_FILE" 2>&1
+    cp -Rpf /tmp /tmpbackup >> "$LOG_FILE" 2>&1
+
+    # Mount the new /tmp partition and set the right permissions
+    mount -t tmpfs -o loop,noexec,nosuid,rw /usr/tmpDSK /tmp >> "$LOG_FILE" 2>&1
+    chmod 1777 /tmp >> "$LOG_FILE" 2>&1
+
+    cp -Rpf /tmpbackup/* /tmp/ >> "$LOG_FILE" 2>&1
+    rm -rf /tmpbackup/* >> "$LOG_FILE" 2>&1
+
+    echo "/usr/tmpDSK /tmp tmpfs loop,nosuid,noexec,rw 0 0" >> /etc/fstab >> "$LOG_FILE" 2>&1
+    mount -o remount /tmp >> "$LOG_FILE" 2>&1
+
+    log "${BLUE}Securing /var/tmp folder ${NC}"
+
+    # Securing the /var/tmp
+    mv /var/tmp /var/tmpold >> "$LOG_FILE" 2>&1
+    ln -s /tmp /var/tmp >> "$LOG_FILE" 2>&1
+    cp -prf /var/tmpold/* /tmp/ >> "$LOG_FILE" 2>&1
+
+    log "${BLUE}Securing /tmp and /var/tmp folders: ${GREEN}DONE${NC}"
+    echo -e "${BLUE}Securing /tmp and /var/tmp folders: ${GREEN}DONE${NC}" >> report.txt
+}
