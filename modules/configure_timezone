@@ -2,7 +2,6 @@
 configure_timezone() {
     log "${BLUE}Configuring timezone${NC}"
     timedatectl set-timezone "$Time_Zone" >> "$LOG_FILE" 2>&1
-    log "`date`"
     log "${BLUE}Configure timezone: ${GREEN}DONE${NC}"
     echo -e "${BLUE}Configure timezone: ${GREEN}DONE${NC}" >> report.txt
 

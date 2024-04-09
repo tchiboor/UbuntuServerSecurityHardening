@@ -3,6 +3,8 @@ set_hostname() {
     log "${BLUE}Configuring hostname. ${NC}"
     hostnamectl set-hostname "$HOSTNAME" >> "$LOG_FILE" 2>&1
     log "Hostname set to $HOSTNAME"
+    log "${BLUE}Updating /etc/hosts with new hostname.${NC}"
+    sed -i "s/127.0.1.1.*/127.0.1.1\t$HOSTNAME/g" /etc/hosts >> "$LOG_FILE" 2>&1
     log "${BLUE}Configuring hostname: ${GREEN}DONE${NC}"
     echo -e "${BLUE}Configuring hostname: ${GREEN}DONE${NC}" >> report.txt  
 }
