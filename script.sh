@@ -46,9 +46,12 @@ password_policy
 disable_sudo_nopasswd
 disable_scp
 remove_nc
-finished_execution
-print_report
 ifaces
 pwd_policy
 shared_mem
 ssh_noroot
+disable_compilers
+rkhunter_scan
+
+finished_execution
+print_report
