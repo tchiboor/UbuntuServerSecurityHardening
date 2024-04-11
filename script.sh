@@ -48,3 +48,7 @@ disable_scp
 remove_nc
 finished_execution
 print_report
+ifaces
+pwd_policy
+shared_mem
+ssh_noroot
