@@ -1,0 +1,35 @@
+ifaces{
+#First store a comma separated list of useful network interfaces  in an environment variable named "ifaces_list"
+# e.g export ifaces_list=eth0,lo,eth1,eth2
+
+# Get the comma-separated list of network interface names from the argument
+IFS=',' read -ra interfaces <<< "$(printenv ifaces_list)"
+
+#echo "Useful interfaces are ${interfaces[@]}"
+# Loop through all available network interfaces
+for iface in $(ifconfig -a | grep '^[a-zA-Z]' | awk '{print $1}' | cut -f1 -d ":"); do
+    # Check if the interface name is not in the list provided as an argument
+    if [[ ! " ${interfaces[@]} " =~ " $iface " ]]; then
+        #read -p "Interface '$iface' is not in the provided list. Do you want to disable it? (y/n): " answer
+        #if [ "$answer" == "y" ]; then
+            sudo ifconfig $iface down
+            log "${BLUE}Interface '$iface' has been disabled ${NC}"
+            
+        #fi
+    fi
+done
+
+
+for iface in $(ifconfig -a | grep '^[a-zA-Z]' | awk '{print $1}' | cut -f1 -d ":"); do
+    # Check if the interface name is not in the list provided as an argument
+    if [[ ! " ${interfaces[@]} " =~ " $iface " ]]; then
+    echo "${RED}Failed to disable all unnecessary interfaces ${NC}" 
+    echo "Failed to disable all unnecessary interfaces" > report.txt
+    exit 1
+    fi
+done
+
+echo "${GREEN}Successfully disabled all unnecessary interfaces ${NC}" 
+echo "Successfully disabled all unnecessary interfaces" > report.txt
+exit 0
+}
