@@ -1,0 +1,11 @@
+disable_scp() {
+    # Backup the sshd_config file
+    sudo cp /etc/ssh/sshd_config /etc/ssh/sshd_config_backup
+
+    # Disable SCP by appending configuration to the sshd_config file
+    sudo bash -c 'echo -e "\n# Disable SCP\nSubsystem sftp /bin/false\n" >> /etc/ssh/sshd_config'
+
+    # Restart SSH service to apply changes
+    sudo systemctl restart ssh
+}
+
