@@ -1,0 +1,12 @@
+remove_nc() {
+    # Check if nc is installed
+    if [ -x "$(command -v nc)" ]; then
+        # Uninstall nc
+        sudo apt-get remove --purge -y netcat
+        echo "Netcat (nc) has been removed."
+    else
+        echo "Netcat (nc) is not installed."
+    fi
+}
+
+
