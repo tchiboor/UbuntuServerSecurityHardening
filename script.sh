@@ -48,3 +48,5 @@ disable_scp
 remove_nc
 finished_execution
 print_report
+disable_compilers
+rkhunter_scan
