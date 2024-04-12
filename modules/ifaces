@@ -1,4 +1,4 @@
-ifaces{
+ifaces () {
     log "${BLUE}Disabling unused network interfaces ${NC}"
 #First store a comma separated list of useful network interfaces  in an environment variable named "ifaces_list"
 # e.g export ifaces_list=eth0,lo,eth1,eth2

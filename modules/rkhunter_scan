@@ -12,6 +12,6 @@ rkhunter_scan() {
         RKHUNTER_LOG="/var/log/rkhunter.log"
         cp "$RKHUNTER_LOG" . >> "$LOG_FILE" 2>&1
         log "${BLUE}rkhunter scan completed. Review rkhunter logs for details: ${ORANGE}CHECK $RKHUNTER  ${NC}"
-        echo -e "${BLUE}rkhunter scan completed. Review rkhunter logs for details: ${ORANGE}CHECK $RKHUNTER  ${NC" >> report.txt
+        echo -e "${BLUE}rkhunter scan completed. Review rkhunter logs for details: ${ORANGE}CHECK $RKHUNTER  ${NC}" >> report.txt
     fi
 }
