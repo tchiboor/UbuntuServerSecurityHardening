@@ -3,5 +3,6 @@ install_dependencies() {
     log "${BLUE}Installing dependencies${NC}"
     apt install -y figlet >> "$LOG_FILE" 2>&1
     apt install -y fail2ban >> "$LOG_FILE" 2>&1
+    apt install -y libpam-pwquality >> "$LOG_FILE" 2>&1
     log "${BLUE}Installing dependencies: ${GREEN}DONE${NC}"
 }

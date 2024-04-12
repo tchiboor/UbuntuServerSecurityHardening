@@ -1,4 +1,5 @@
 ifaces{
+    log "${BLUE}Disabling unused network interfaces ${NC}"
 #First store a comma separated list of useful network interfaces  in an environment variable named "ifaces_list"
 # e.g export ifaces_list=eth0,lo,eth1,eth2
 
@@ -12,9 +13,9 @@ for iface in $(ifconfig -a | grep '^[a-zA-Z]' | awk '{print $1}' | cut -f1 -d ":
     if [[ ! " ${interfaces[@]} " =~ " $iface " ]]; then
         #read -p "Interface '$iface' is not in the provided list. Do you want to disable it? (y/n): " answer
         #if [ "$answer" == "y" ]; then
-            sudo ifconfig $iface down
-            log "${BLUE}Interface '$iface' has been disabled ${NC}"
-            
+            ifconfig $iface down >> "$LOG_FILE" 2>&1
+            log "${BLUE}Interface '$iface' has been disabled: ${GREEN}DONE ${NC}"
+                       
         #fi
     fi
 done
@@ -23,13 +24,13 @@ done
 for iface in $(ifconfig -a | grep '^[a-zA-Z]' | awk '{print $1}' | cut -f1 -d ":"); do
     # Check if the interface name is not in the list provided as an argument
     if [[ ! " ${interfaces[@]} " =~ " $iface " ]]; then
-    echo "${RED}Failed to disable all unnecessary interfaces ${NC}" 
-    echo "Failed to disable all unnecessary interfaces" > report.txt
+    log "${BLUE}Failed to disable all unnecessary interfaces: ${RED}FAILED ${NC}"
+    echo -e "${BLUE}Failed to disable all unnecessary interfaces: ${RED}FAILED ${NC}" >> report.txt
     exit 1
     fi
 done
 
-echo "${GREEN}Successfully disabled all unnecessary interfaces ${NC}" 
-echo "Successfully disabled all unnecessary interfaces" > report.txt
+log "${BLUE}Successfully disabled all unnecessary interfaces: ${GREEN}DONE ${NC}" 
+echo -e "${BLUE}Successfully disabled all unnecessary interfaces: ${GREEN}DONE ${NC}" >> report.txt
 exit 0
 }

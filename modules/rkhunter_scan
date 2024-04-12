@@ -1,19 +1,17 @@
 # Function to perform rkhunter scan and display logs
 rkhunter_scan() {
-    # Check if running as root
-    if [[ $EUID -ne 0 ]]; then
-        echo "This script must be run as root."
-        exit 1
-    fi
-
     # Perform rkhunter scan
-    echo "Starting rkhunter scan"
-    rkhunter --check --sk > /dev/null 2>&1
+    log "${BLUE}Starting rkhunter scan ${NC}"
+    rkhunter --check --sk >> "$LOG_FILE" 2>&1
 
     # Check the result of the scan
     if [[ $? -eq 0 ]]; then
-        echo "rkhunter scan completed. No rootkits or suspicious files found."
+        log "${BLUE}rkhunter scan completed. No rootkits or suspicious files found: ${GREEN}DONE ${NC}."
+        echo -e "${BLUE}rkhunter scan completed. No rootkits or suspicious files found: ${GREEN}DONE ${NC}" >> report.txt
     else
-        echo "rkhunter scan completed. Review rkhunter logs for details."
+        RKHUNTER_LOG="/var/log/rkhunter.log"
+        cp "$RKHUNTER_LOG" . >> "$LOG_FILE" 2>&1
+        log "${BLUE}rkhunter scan completed. Review rkhunter logs for details: ${ORANGE}CHECK $RKHUNTER  ${NC}"
+        echo -e "${BLUE}rkhunter scan completed. Review rkhunter logs for details: ${ORANGE}CHECK $RKHUNTER  ${NC" >> report.txt
     fi
 }
