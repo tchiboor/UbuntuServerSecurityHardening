@@ -1,4 +1,4 @@
-shared_mem{
+shared_mem (){
 
 #https://help.ubuntu.com/community/StricterDefaults
 #By default, /run/shm is mounted read/write, with permission to execute programs. In recent years, many security mailing lists have noted many exploits where /run/shm is used in an attack against a running service, such as httpd.
@@ -11,7 +11,7 @@ if [ $? -ne 0 ]; then
     log "${BLUE}Failed to secure the shared memory: ${RED}FAILED ${NC}" 
     echo -e "${BLUE}Failed to secure the shared memory: ${RED}FAILED" >> report.txt
 else
-    log "${BLUE}Successfully secured the shared memory: ${RED}DONE ${NC}" 
-    echo -e "${BLUE}Successfully secure the shared memory: ${RED}DONE ${NC}" >> report.txt
+    log "${BLUE}Successfully secured the shared memory: ${GREEN}DONE ${NC}" 
+    echo -e "${BLUE}Successfully secure the shared memory: ${GREEN}DONE ${NC}" >> report.txt
 fi
 }

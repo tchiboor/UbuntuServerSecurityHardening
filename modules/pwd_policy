@@ -1,4 +1,4 @@
-pwd_policy{
+pwd_policy () {
     log "${BLUE}COnfiguring password policy ${NC}"
 #backup the config file
 log "${BLUE}Creating a backup of /etc/pam.d/common-password ${NC}"
