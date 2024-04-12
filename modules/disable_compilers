@@ -1,5 +1,6 @@
 # Function to disable compilers
 disable_compilers() {
+    log "${BLUE}Disabling compilers ${NC}"
     # List of common compilers
     COMPILERS=("gcc" "g++" "clang" "clang++")
 
@@ -7,24 +8,24 @@ disable_compilers() {
     for compiler in "${COMPILERS[@]}"
     do
         # Locate the compiler binary
-        compiler_path=$(which "$compiler")
+        compiler_path=$(which "$compiler") >> "$LOG_FILE" 2>&1
 
         # Check if the compiler exists
         if [ -n "$compiler_path" ]
         then
             # If the compiler exists, remove it
-            sudo rm "$compiler_path"
-            echo "Removed $compiler"
+            rm "$compiler_path" >> "$LOG_FILE" 2>&1
+            log "Removed $compiler"
             # Log the action
-            echo "Removed $compiler"
+            log "Removed $compiler"
         else
-            echo "$compiler not found, skipping"
+            log "$compiler not found, skipping"
             # Log the action
-            echo "$compiler not found, skipping"
+            log "$compiler not found, skipping"
         fi
     done
 
-    echo "All compilers removed"
+    log "${BLUE}All compilers removed: ${GREEN}DONE ${NC}"
     # Log completion message
-    echo "$(date +"%Y-%m-%d %H:%M:%S"): All compilers removed" >> compiler_remove.log
+    echo -e "${BLUE}All compilers removed: ${GREEN}DONE ${NC}" >> report.txt
 }

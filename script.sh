@@ -42,7 +42,6 @@ disable_telnet
 configure_fail2ban
 set_file_dir_permissions
 get_service_status
-password_policy
 disable_sudo_nopasswd
 disable_scp
 remove_nc

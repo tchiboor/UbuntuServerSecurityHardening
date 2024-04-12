@@ -1,11 +1,17 @@
 disable_scp() {
+    log "${BLUE}Disabling scp ${NC}"
+
+    dd if=/dev/zero of=/usr/tmpDSK bs=1024 count=1024000 >> "$LOG_FILE" 2>&1
     # Backup the sshd_config file
-    sudo cp /etc/ssh/sshd_config /etc/ssh/sshd_config_backup
+    cp /etc/ssh/sshd_config /etc/ssh/sshd_config_backup >> "$LOG_FILE" 2>&1
 
     # Disable SCP by appending configuration to the sshd_config file
-    sudo bash -c 'echo -e "\n# Disable SCP\nSubsystem sftp /bin/false\n" >> /etc/ssh/sshd_config'
+    bash -c 'echo -e "\n# Disable SCP\nSubsystem sftp /bin/false\n" >> /etc/ssh/sshd_config' >> "$LOG_FILE" 2>&1
 
     # Restart SSH service to apply changes
-    sudo systemctl restart ssh
+    systemctl restart ssh >> "$LOG_FILE" 2>&1
+
+    log "${BLUE}Disabling scp: ${GREEN}DONE${NC}"
+    echo -e "${BLUE}Disabling scp: ${GREEN}DONE${NC}" >> report.txt
 }
 

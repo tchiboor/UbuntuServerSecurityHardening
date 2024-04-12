@@ -8,10 +8,10 @@ log "${BLUE}Adding 'tmpfs /run/shm tmpfs defaults,noexec,nosuid 0 0' to /etc/fst
 echo 'tmpfs /run/shm tmpfs defaults,noexec,nosuid 0 0' >>  /etc/fstab
 
 if [ $? -ne 0 ]; then
-    echo "${RED}Failed to secure the shared memory${NC}" 
-    echo "Failed to secure the shared memory" > report.txt
+    log "${BLUE}Failed to secure the shared memory: ${RED}FAILED ${NC}" 
+    echo -e "${BLUE}Failed to secure the shared memory: ${RED}FAILED" >> report.txt
 else
-    echo "${GREEN}Successfully secured the shared memory${NC}" 
-    echo "Successfully secure the shared memory" > report.txt
+    log "${BLUE}Successfully secured the shared memory: ${RED}DONE ${NC}" 
+    echo -e "${BLUE}Successfully secure the shared memory: ${RED}DONE ${NC}" >> report.txt
 fi
 }

@@ -1,26 +1,30 @@
 disable_sudo_nopasswd() {
     
+    log  "${BLUE}Disabling Sudo Nopasswd. ${NC}"
     # Check if the sudoers file exists
     if [ ! -f /etc/sudoers ]; then
-        echo "Sudoers file not found" >&2
+        echo "Sudoers file not found" >> "$LOG_FILE" 2>&1
         return 1
     fi
 
     # Backup sudoers file
-    cp /etc/sudoers /etc/sudoers.bak
+    cp /etc/sudoers /etc/sudoers.bak >> "$LOG_FILE" 2>&1
 
     # Disable sudo nopasswd
-    sed -i '/NOPASSWD:ALL/d' /etc/sudoers
+    sed -i '/NOPASSWD:ALL/d' /etc/sudoers >> "$LOG_FILE" 2>&1
 
     # Check if sudoers file was modified successfully
     if [ $? -eq 0 ]; then
-        echo "Sudo nopasswd disabled successfully"
+        log "Sudo nopasswd disabled successfully"
+        log "${BLUE}Disabling Sudo Nopasswd: ${GREEN}DONE${NC}"
+        echo -e "${BLUE}Disabling Sudo Nopasswd: ${GREEN}DONE${NC}" >> report.txt
         return 0
     else
-        echo "Failed to disable sudo nopasswd" >&2
+        log "Failed to disable sudo nopasswd"
         # Restore backup
-        mv /etc/sudoers.bak /etc/sudoers
+        mv /etc/sudoers.bak /etc/sudoers >> "$LOG_FILE" 2>&1
+        log "${BLUE}Disabling Sudo Nopasswd: ${RED}FAILED${NC}"
+        echo -e "${BLUE}Disabling Sudo Nopasswd: ${RED}FAILED${NC}" >> report.txt
         return 1
     fi
 }
-
