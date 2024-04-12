@@ -45,12 +45,12 @@ get_service_status
 disable_sudo_nopasswd
 disable_scp
 remove_nc
-ifaces
 pwd_policy
 shared_mem
 ssh_noroot
 disable_compilers
 rkhunter_scan
+ifaces
 
 finished_execution
 print_report

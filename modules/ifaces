@@ -1,36 +1,42 @@
-ifaces () {
+ifaces() {
     log "${BLUE}Disabling unused network interfaces ${NC}"
-#First store a comma separated list of useful network interfaces  in an environment variable named "ifaces_list"
-# e.g export ifaces_list=eth0,lo,eth1,eth2
 
-# Get the comma-separated list of network interface names from the argument
-IFS=',' read -ra interfaces <<< "$(printenv ifaces_list)"
+    # Check if ifaces_list environment variable is set
+    if [ -z "$ifaces_list" ]; then
+        log "${RED}Error: 'ifaces_list' environment variable is not set.${NC}"
+        exit 1
+    fi
 
-#echo "Useful interfaces are ${interfaces[@]}"
-# Loop through all available network interfaces
-for iface in $(ifconfig -a | grep '^[a-zA-Z]' | awk '{print $1}' | cut -f1 -d ":"); do
-    # Check if the interface name is not in the list provided as an argument
-    if [[ ! " ${interfaces[@]} " =~ " $iface " ]]; then
-        #read -p "Interface '$iface' is not in the provided list. Do you want to disable it? (y/n): " answer
-        #if [ "$answer" == "y" ]; then
-            ifconfig $iface down >> "$LOG_FILE" 2>&1
+    # Get the comma-separated list of network interface names from the argument
+    IFS=',' read -ra interfaces <<< "$ifaces_list"
+
+    # Flag to track if any unnecessary interface was disabled
+    any_disabled=false
+    disabled_interfaces=""
+
+    # Loop through all available network interfaces
+    for iface in $(ip link show | awk -F': ' '{print $2}'); do
+        # Check if the interface name is not in the list provided as an argument
+        if [[ ! " ${interfaces[@]} " =~ " $iface " ]]; then
+            # Disable the interface
+            ip link set $iface down >> "$LOG_FILE" 2>&1
             log "${BLUE}Interface '$iface' has been disabled: ${GREEN}DONE ${NC}"
-                       
-        #fi
+            any_disabled=true
+            disabled_interfaces+=" $iface"
+        else
+            # Log that the interface is useful and has not been disabled
+            log "${BLUE}Interface '$iface' is useful: Not Disabled ${NC}"
+        fi
+    done
+
+    # Check if any unnecessary interface was disabled
+    if $any_disabled; then
+        log "${BLUE}The following unnecessary interfaces have been disabled: $disabled_interfaces. ${GREEN}DONE ${NC}" 
+        echo -e "${BLUE}The following unnecessary interfaces have been disabled: $disabled_interfaces. ${GREEN}DONE${NC}" >> report.txt
+        exit 0
+    else
+        log "${BLUE}No unnecessary interface to disable: ${GREEN}DONE${NC}"
+        echo -e "${BLUE}No unnecessary interface to disable: ${GREEN}DONE${NC}" >> report.txt
+        exit 0
     fi
-done
-
-
-for iface in $(ifconfig -a | grep '^[a-zA-Z]' | awk '{print $1}' | cut -f1 -d ":"); do
-    # Check if the interface name is not in the list provided as an argument
-    if [[ ! " ${interfaces[@]} " =~ " $iface " ]]; then
-    log "${BLUE}Failed to disable all unnecessary interfaces: ${RED}FAILED ${NC}"
-    echo -e "${BLUE}Failed to disable all unnecessary interfaces: ${RED}FAILED ${NC}" >> report.txt
-    exit 1
-    fi
-done
-
-log "${BLUE}Successfully disabled all unnecessary interfaces: ${GREEN}DONE ${NC}" 
-echo -e "${BLUE}Successfully disabled all unnecessary interfaces: ${GREEN}DONE ${NC}" >> report.txt
-exit 0
 }
