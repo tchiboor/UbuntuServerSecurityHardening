@@ -5,6 +5,6 @@ install_dependencies() {
     apt install -y fail2ban >> "$LOG_FILE" 2>&1 || log "${RED}Error installing fail2ban. Check log file${NC}"
     apt install -y libpam-pwquality >> "$LOG_FILE" 2>&1 || log "${RED}Error installing libpam-pwquality. Check log file${NC}"
     apt install -y net-tools >> "$LOG_FILE" 2>&1 || log "${RED}Error installing net-tools. Check log file${NC}"
-    apt install -y rkhunter >> "$LOG_FILE" 2>&1 || log "${RED}Error installing rkhunter. Check log file ${NC}"
+    DEBIAN_FRONTEND=noninteractive apt install -y rkhunter >> "$LOG_FILE" 2>&1 || log "${RED}Error installing rkhunter. Check log file ${NC}"
     log "${BLUE}Installing dependencies: ${GREEN}DONE${NC}"
 }
