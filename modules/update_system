@@ -1,10 +1,10 @@
 # Function to update the system
 update_system() {
     log "${BLUE}Updating the package lists and upgrading the installed packages${NC}"
-    apt update >> "$LOG_FILE" 2>&1
+    apt update -y >> "$LOG_FILE" 2>&1
     apt upgrade -y >> "$LOG_FILE" 2>&1
-    apt autoremove >> "$LOG_FILE" 2>&1
-    apt autoclean >> "$LOG_FILE" 2>&1
+    apt autoremove -y >> "$LOG_FILE" 2>&1
+    apt autoclean -y >> "$LOG_FILE" 2>&1
     log "${BLUE}System update and upgrade: ${GREEN}DONE${NC}"
     echo -e "${BLUE}System update and upgrade: ${GREEN}DONE${NC}" >> report.txt
 

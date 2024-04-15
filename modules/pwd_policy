@@ -1,58 +1,50 @@
-# Function to configure password policy
-pwd_policy() {
-    log "${BLUE}Configuring password policy${NC}"
-    
-    # Backup the config file
-    log "${BLUE}Creating a backup of /etc/pam.d/common-password${NC}"
-    if cp /etc/pam.d/common-password /etc/pam.d/common-password.bak >> "$LOG_FILE" 2>&1; then
-        log "${BLUE}Successfully created a backup: ${GREEN}DONE${NC}"
-        echo -e "${BLUE}Successfully created a backup: ${GREEN}DONE${NC}" >> report.txt
-    else
-        log "${BLUE}Failed to create a backup: ${RED}FAILED${NC}" 
-        echo -e "${BLUE}Failed to create a backup: ${RED}FAILED${NC}" >> report.txt
-    fi
-    
-    # Add "minlen=8"
-    log "${BLUE}Setting minimum length 8${NC}"
-    if sed -i '/^password.*\[success=/ s/$/ minlen=8/' /etc/pam.d/common-password >> "$LOG_FILE" 2>&1; then
-        log "${BLUE}Successfully updated /etc/pam.d/common-password${NC}"
-        echo -e "${BLUE}Successfully updated /etc/pam.d/common-password: ${GREEN}DONE${NC}" >> report.txt
-    else
-        log "${RED}Failed to edit /etc/pam.d/common-password: ${RED}FAILED${NC}" 
-        echo -e "${BLUE}Failed to edit /etc/pam.d/common-password: ${RED}FAILED${NC}" >> report.txt
-    fi
-    
-    # Set requirement for at least one uppercase, lowercase, digit, and special char
-    log "${BLUE}Setting password complexity requirements (uppercase, lowercase, digit, and special char)${NC}"
-    if sed -i '/^password.*requisite/ s/pam_deny.so/pam_pwquality.so retry=3 lcredit=-1 ucredit=-1 dcredit=-1 ocredit=-1/' /etc/pam.d/common-password >> "$LOG_FILE" 2>&1; then
-        log "${BLUE}Successfully updated /etc/pam.d/common-password${NC}"
-        echo -e "${BLUE}Successfully updated /etc/pam.d/common-password: ${GREEN}DONE${NC}" >> report.txt
-    else
-        log "${BLUE}Failed to edit /etc/pam.d/common-password: ${RED}FAILED${NC}" 
-        echo -e "${BLUE}Failed to edit /etc/pam.d/common-password: ${RED}FAILED${NC}" >> report.txt
-        return 1
-    fi
-    
-    # Set password expiry time to ~6 months and the warning period before deadline to 2 weeks
-    log "${BLUE}Setting password expiry to ~6 months${NC}"
-    if sed -i '/^PASS_MAX_DAYS/ s/^.*$/PASS_MAX_DAYS   185/' /etc/login.defs >> "$LOG_FILE" 2>&1 && \
-       sed -i '/^PASS_WARN_AGE/ s/^.*$/PASS_WARN_AGE   30/' /etc/login.defs >> "$LOG_FILE" 2>&1; then
-        log "${BLUE}Successfully updated /etc/login.defs${NC}"
-        echo -e "${BLUE}Successfully updated /etc/login.defs: ${GREEN}DONE${NC}" >> report.txt
-    else
-        log "${BLUE}Failed to edit /etc/login.defs: ${RED}FAILED${NC}" 
-        echo -e "${BLUE}Failed to edit /etc/login.defs: ${RED}FAILED${NC}" >> report.txt
-        return 1
-    fi
-    
-    # Forbid previous 5 passwords reuse
-    log "${BLUE}Setting anti password reuse policy${NC}"
-    if sed -i '/^password.*\[success=/ s/$/ remember=5/' /etc/pam.d/common-password >> "$LOG_FILE" 2>&1; then
-        log "${BLUE}Successfully updated anti password reuse${NC}"
-        echo -e "${BLUE}Successfully updated anti password reuse: ${GREEN}DONE${NC}" >> report.txt
-    else
-        log "${RED}Failed to edit /etc/pam.d/common-password: ${RED}FAILED${NC}" 
-        echo -e "${RED}Failed to edit /etc/pam.d/common-password: ${RED}FAILED${NC}" >> report.txt
-        return 1
-    fi
+pwd_policy () {
+    log "${BLUE}COnfiguring password policy ${NC}"
+#backup the config file
+log "${BLUE}Creating a backup of /etc/pam.d/common-password ${NC}"
+cp /etc/pam.d/common-password /etc/pam.d/common-password.bak >> "$LOG_FILE" 2>&1
+if [ $? -ne 0 ]; then
+    log "${BLUE}Failed to create a backup: ${RED}FAILED ${NC}" 
+    echo -e "${BLUE}Failed to create a backup: ${RED}FAILED ${NC}" >> report.txt
+else
+    log "${BLUE}Successfully created a backup: ${GREEN}DONE ${NC}" 
+    echo -e "${BLUE}Successfully created a backup: ${GREEN}DONE ${NC}" >> report.txt
+fi
+
+# Update password policy
+log "${BLUE}Updating password policy${NC}"
+if sed -i '/^password.*\[success=/ {
+        s/$/ minlen=8/;
+        s/$/ remember=5/
+    }' /etc/pam.d/common-password >> "$LOG_FILE" 2>&1; then
+    log "${BLUE}Successfully updated password policy${NC}"
+    echo -e "${BLUE}Successfully updated password policy: ${GREEN}DONE${NC}" >> report.txt
+else
+    log "${RED}Failed to update password policy: ${RED}FAILED${NC}" 
+    echo -e "${BLUE}Failed to update password policy: ${RED}FAILED${NC}" >> report.txt
+    return 1
+fi
+
+# set requirement for at least one uppercase (ucredit) at least one lowercase (lcredit), at least one digit (dcredit) and at least one special char (ocredit)
+log "${BLUE}Setting password complexity requirements (uppercase, lowercase, digit, and special char ${NC}"
+sed -i '/^password.*requisite/ s/pam_deny.so/pam_pwquality.so retry=3 lcredit=-1 ucredit=-1 dcredit=-1 ocredit=-1/' /etc/pam.d/common-password >> "$LOG_FILE" 2>&1
+if [ $? -ne 0 ]; then
+    log "${BLUE}Failed to edit /etc/pam.d/common-password: ${RED}FAILED ${NC}" 
+    echo -e "${BLUE}Failed to edit /etc/pam.d/common-password: ${RED}FAILED ${NC}" >> report.txt
+else
+    log "${BLUE}Successfully updated /etc/pam.d/common-password: ${GREEN}DONE ${NC}" 
+    echo -e "${BLUE}Successfully updated /etc/pam.d/common-password: ${GREEN}DONE ${NC}" >> report.txt
+fi
+
+# set password expiry time to ~6 months and the warning period before deadline to 2 weeks
+log "${BLUE}Setting password expiry to ~6 months ${NC}"
+sed -i '/^PASS_MAX_DAYS/ s/^.*$/PASS_MAX_DAYS   185/' /etc/login.defs >> "$LOG_FILE" 2>&1
+sed -i '/^PASS_WARN_AGE/ s/^.*$/PASS_WARN_AGE   30/' /etc/login.defs >> "$LOG_FILE" 2>&1
+if [ $? -ne 0 ]; then
+    log "${BLUE}Failed to edit /etc/login.defs: ${RED}FAILED ${NC}" 
+    echo -e "${BLUE}Failed to edit /etc/login.defs: ${RED}FAILED ${NC}" >> report.txt
+else
+    log "${BLUE}Successfully updated /etc/login.defs: ${GREEN}DONE ${NC}" 
+    echo -e "${BLUE}Successfully updated /etc/login.defs: ${GREEN}DONE ${NC}" >> report.txt
+fi
 }
