@@ -1,9 +1,9 @@
 # Function to install dependencies
 install_dependencies() {
     log "${BLUE}Installing dependencies${NC}"
-    apt install -y figlet >> "$LOG_FILE" 2>&1
-    apt install -y fail2ban >> "$LOG_FILE" 2>&1
-    apt install -y libpam-pwquality >> "$LOG_FILE" 2>&1
-    apt install -y net-tools >> "$LOG_FILE" 2>&1
+    apt install -y figlet >> "$LOG_FILE" 2>&1 || log "${RED}Error installing figlet. Check log file${NC}"
+    apt install -y fail2ban >> "$LOG_FILE" 2>&1 || log "${RED}Error installing fail2ban. Check log file${NC}"
+    apt install -y libpam-pwquality >> "$LOG_FILE" 2>&1 || log "${RED}Error installing libpam-pwquality. Check log file${NC}"
+    apt install -y net-tools >> "$LOG_FILE" 2>&1 || log "${RED}Error installing net-tools. Check log file${NC}"
     log "${BLUE}Installing dependencies: ${GREEN}DONE${NC}"
 }

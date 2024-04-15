@@ -1,10 +1,35 @@
 # Function to set the hostname
 set_hostname() {
-    log "${BLUE}Configuring hostname. ${NC}"
+    log "${BLUE}Configuring hostname.${NC}"
+
+    # Flag to track success of each operation
+    hostname_success=0
+    hosts_success=0
+    
+    # Set hostname
     hostnamectl set-hostname "$HOSTNAME" >> "$LOG_FILE" 2>&1
-    log "Hostname set to $HOSTNAME"
-    log "${BLUE}Updating /etc/hosts with new hostname.${NC}"
+    if [ $? -ne 0 ]; then
+        log "${BLUE}Error setting hostname: ${RED}FAILED${NC}"
+    else
+        log "${BLUE}Configuring hostname: ${GREEN}DONE${NC}"
+        hostname_success=1
+    fi
+
+    # Update /etc/hosts
     sed -i "s/127.0.1.1.*/127.0.1.1\t$HOSTNAME/g" /etc/hosts >> "$LOG_FILE" 2>&1
-    log "${BLUE}Configuring hostname: ${GREEN}DONE${NC}"
-    echo -e "${BLUE}Configuring hostname: ${GREEN}DONE${NC}" >> report.txt  
+    if [ $? -ne 0 ]; then
+        log "${BLUE}Error updating /etc/hosts: ${RED}FAILED${NC}"
+    else
+        log "${BLUE}Updating /etc/hosts with new hostname: ${GREEN}DONE${NC}"
+        hosts_success=1
+    fi
+
+    # Log final status
+    if [ "$hostname_success" -eq 1 ] && [ "$hosts_success" -eq 1 ]; then
+        log "${BLUE}Configuring hostname: ${GREEN}DONE${NC}"
+        echo -e "${BLUE}Configuring hostname: ${GREEN}DONE${NC}" >> report.txt
+    else
+        log "${BLUE}Configuring hostname: ${RED}FAILED, check logs${NC}"
+        echo -e "${BLUE}Configuring hostname: ${RED}FAILED, check logs${NC}" >> report.txt
+    fi
 }
