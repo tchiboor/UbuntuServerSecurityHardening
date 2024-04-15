@@ -1,15 +1,15 @@
-ssh_noroot(){
-log "${BLUE}Setting 'PermitRootLogin no' in /etc/ssh/sshd_config ${NC}"
-sed -i 's/PermitRootLogin yes/PermitRootLogin no/g' /etc/ssh/sshd_config >> "$LOG_FILE" 2>&1
-
-#Check if it was successful
-grep "PermitRootLogin no" /etc/ssh/sshd_config >> "$LOG_FILE" 2>&1
-
-if [ $? -ne 0 ]; then
-    echo -e "${BLUE}Failed to disable root SSH login: ${RED}FAILED ${NC}"
-    echo -e "${BLUE}Failed to disable root SSH login: ${RED}FAILED ${NC}" >> report.txt
-else
-    log "${BLUE}Successfully disabled root SSH login: ${GREEN}DONE${NC}" 
-    echo -e "${BLUE}Successfully disabled root SSH login: ${GREEN}DONE" >> report.txt
-fi
+ssh_noroot() {
+    log "${BLUE}Setting 'PermitRootLogin no' in /etc/ssh/sshd_config ${NC}"
+    
+    # Update sshd_config to disable root login
+    sed -i 's/PermitRootLogin yes/PermitRootLogin no/g' /etc/ssh/sshd_config >> "$LOG_FILE" 2>&1
+    
+    # Check if modification was successful
+    if grep -q "PermitRootLogin no" /etc/ssh/sshd_config; then
+        log "${BLUE}Successfully disabled root SSH login: ${GREEN}DONE${NC}"
+        echo -e "${BLUE}Successfully disabled root SSH login: ${GREEN}DONE${NC}" >> report.txt
+    else
+        log "${BLUE}Failed to disable root SSH login: ${RED}FAILED${NC}"
+        echo -e "${BLUE}Failed to disable root SSH login: ${RED}FAILED${NC}" >> report.txt
+    fi
 }
