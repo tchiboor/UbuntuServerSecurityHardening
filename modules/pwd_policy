@@ -11,19 +11,29 @@ else
     echo -e "${BLUE}Successfully created a backup: ${GREEN}DONE ${NC}" >> report.txt
 fi
 
-# Update password policy
-log "${BLUE}Updating password policy${NC}"
-if sed -i '/^password.*\[success=/ {
-        s/$/ minlen=8/;
-        s/$/ remember=5/
-    }' /etc/pam.d/common-password >> "$LOG_FILE" 2>&1; then
-    log "${BLUE}Successfully updated password policy${NC}"
-    echo -e "${BLUE}Successfully updated password policy: ${GREEN}DONE${NC}" >> report.txt
+
+#add "minlen=8"
+log "${BLUE}Setting minimum length 8 ${NC}"
+sed -i '/^password.*\[success=/ s/$/ minlen=8/' /etc/pam.d/common-password >> "$LOG_FILE" 2>&1
+if [ $? -ne 0 ]; then
+    log "${RED}Failed to edit /etc/pam.d/common-password$: ${RED}FAILED ${NC}" 
+    echo -e "${BLUE}Failed to edit /etc/pam.d/common-password: ${RED}FAILED ${NC}" >> report.txt
 else
-    log "${RED}Failed to update password policy: ${RED}FAILED${NC}" 
-    echo -e "${BLUE}Failed to update password policy: ${RED}FAILED${NC}" >> report.txt
-    return 1
+    log "${BLUE}Successfully updated $/etc/pam.d/common-password ${NC}" 
+    echo -e "${BLUE}Successfully updated /etc/pam.d/common-password: ${GREEN}DONE ${NC}" >> report.txt
 fi
+
+install password quality checking library
+log "${BLUE}installing libpam-pwquality ${NC}"
+
+if [ $? -ne 0 ]; then
+    echo "${RED}Failed to install libpam-pwquality ${NC}" 
+    echo "Failed to install libpam-pwquality" >> report.txt
+else
+    echo "${GREEN}Successfully installed libpam-pwquality ${NC}" 
+    echo "Successfully uinstalled libpam-pwquality " >> report.txt
+fi
+
 
 # set requirement for at least one uppercase (ucredit) at least one lowercase (lcredit), at least one digit (dcredit) and at least one special char (ocredit)
 log "${BLUE}Setting password complexity requirements (uppercase, lowercase, digit, and special char ${NC}"
@@ -46,5 +56,19 @@ if [ $? -ne 0 ]; then
 else
     log "${BLUE}Successfully updated /etc/login.defs: ${GREEN}DONE ${NC}" 
     echo -e "${BLUE}Successfully updated /etc/login.defs: ${GREEN}DONE ${NC}" >> report.txt
+fi
+
+
+#Forbid previous 5 passwords reuse
+log "${BLUE}Setting anti password reuse policy ${NC}"
+sed -i '/^password.*\[success=/ s/$/ remember=5/' /etc/pam.d/common-password >> "$LOG_FILE" 2>&1
+if [ $? -ne 0 ]; then
+    log "${RED}Failed edit ${NC}" 
+    echo -e "${RED}Failed to edit " >> report.txt
+else
+    echo "${GREEN}Successfully updated ${NC}" 
+    echo "Successfully updated " >> report.txt
+    log "${BLUE}Successfully updated anti password reuse: ${GREEN}DONE ${NC}" 
+    echo -e "${BLUE}Successfully updated anti password reuse: ${GREEN}DONE ${NC}" >> report.txt
 fi
 }
