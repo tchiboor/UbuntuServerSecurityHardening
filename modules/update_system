@@ -1,11 +1,17 @@
 # Function to update the system
 update_system() {
     log "${BLUE}Updating the package lists and upgrading the installed packages${NC}"
-    apt update -y >> "$LOG_FILE" 2>&1
-    apt upgrade -y >> "$LOG_FILE" 2>&1
-    apt autoremove -y >> "$LOG_FILE" 2>&1
-    apt autoclean -y >> "$LOG_FILE" 2>&1
-    log "${BLUE}System update and upgrade: ${GREEN}DONE${NC}"
-    echo -e "${BLUE}System update and upgrade: ${GREEN}DONE${NC}" >> report.txt
+    
+    # Perform update, upgrade, autoremove, and autoclean in a single command
+    apt update -y && apt upgrade -y && apt autoremove -y && apt autoclean -y >> "$LOG_FILE" 2>&1
 
+    if [ $? -eq 0 ]; then
+        log "${BLUE}System update and upgrade: ${GREEN}DONE${NC}"
+        echo -e "${BLUE}System update and upgrade: ${GREEN}DONE${NC}" >> report.txt
+    else
+        log "${BLUE}System update and upgrade: ${RED}FAILED, check logs${NC}"
+        echo -e "${BLUE}System update and upgrade: ${RED}FAILED, check logs${NC}" >> report.txt
+        return 1
+    fi
 }
+
