@@ -33,7 +33,7 @@ create_log_file
 install_dependencies
 create_report_file
 set_hostname
-configure_timezone2
+configure_timezone
 update_system
 system_update_weekly_cron_job
 secure_tmp_folders

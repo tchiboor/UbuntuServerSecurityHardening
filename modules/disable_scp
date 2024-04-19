@@ -1,4 +1,4 @@
-disable_sftp_and_scp() {
+disable_scp() {
     log "${BLUE}Disabling SFTP and SCP.${NC}"
 
     # Backup the sshd_config file
