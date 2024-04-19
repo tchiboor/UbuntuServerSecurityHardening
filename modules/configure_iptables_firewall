@@ -1,6 +1,5 @@
 # Function to configure IP tables firewal
 configure_iptables_firewall() {
-    # Port 80 (HTTP) and Port 22 (SSH)
     log "${BLUE}Configuring iptables firewall${NC}"
 
     # Split the PORTS string into an array
@@ -8,12 +7,25 @@ configure_iptables_firewall() {
 
     # Loop through each port and configure iptables rules
     for port in "${PORTS_ARRAY[@]}"; do
-        iptables -A INPUT -p tcp -m tcp --dport "$port" -m state --state NEW,ESTABLISHED -j ACCEPT >> "$LOG_FILE" 2>&1
+        # Add iptables rule for each port
+        if ! iptables -A INPUT -p tcp -m tcp --dport "$port" -m state --state NEW,ESTABLISHED -j ACCEPT >> "$LOG_FILE" 2>&1; then
+            log "${RED}Error configuring iptables rule for port $port.${NC}"
+            exit 1
+        fi
     done
 
-    iptables -A INPUT -i lo -j ACCEPT >> "$LOG_FILE" 2>&1
-    iptables -A INPUT -j DROP >> "$LOG_FILE" 2>&1
+    # Allow loopback traffic
+    if ! iptables -A INPUT -i lo -j ACCEPT >> "$LOG_FILE" 2>&1; then
+        log "${RED}Error configuring iptables rule for loopback traffic.${NC}"
+        exit 1
+    fi
 
-    log "${BLUE}Configuring iptables firewall$: ${GREEN}DONE${NC}"
-    echo -e "${BLUE}Configuring iptables firewall$: ${GREEN}DONE${NC}" >> report.txt
+    # Drop all other traffic (default policy)
+    if ! iptables -A INPUT -j DROP >> "$LOG_FILE" 2>&1; then
+        log "${RED}Error configuring iptables rule to drop all other traffic.${NC}"
+        exit 1
+    fi
+
+    log "${BLUE}Configuring iptables firewall: ${GREEN}DONE${NC}"
+    echo -e "${BLUE}Configuring iptables firewall: ${GREEN}DONE${NC}" >> report.txt
 }

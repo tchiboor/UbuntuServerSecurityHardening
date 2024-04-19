@@ -33,11 +33,12 @@ create_log_file
 install_dependencies
 create_report_file
 set_hostname
-configure_timezone
+configure_timezone2
 update_system
 system_update_weekly_cron_job
 secure_tmp_folders
 configure_iptables_firewall
+
 disable_telnet
 configure_fail2ban
 set_file_dir_permissions

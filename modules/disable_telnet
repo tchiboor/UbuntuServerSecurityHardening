@@ -1,7 +1,24 @@
-# Function to disable telnet
+#Function to disable telnet
 disable_telnet() {
     log "${BLUE}Disabling Telnet Service${NC}"
-    apt purge telnet telnetd inetutils-telnetd telnetd-ssl -y >> "$LOG_FILE" 2>&1
+
+    telnet_packages=("telnet" "telnetd" "inetutils-telnetd" "telnetd-ssl")
+
+    for package in "${telnet_packages[@]}"; do
+        # Check if the package is installed
+        if dpkg -l "$package" &> /dev/null; then
+            # Uninstall the package
+            if apt purge "$package" -y >> "$LOG_FILE" 2>&1; then
+                log "${GREEN}Successfully uninstalled $package.${NC}"
+            else
+                log "${RED}Failed to uninstall $package.${NC}"
+            fi
+        else
+            log "${YELLOW}$package is not installed.${NC}"
+        fi
+    done
+
     log "${BLUE}Disabling Telnet Service: ${GREEN}DONE${NC}"
     echo -e "${BLUE}Disabling Telnet Service: ${GREEN}DONE${NC}" >> report.txt
 }
+
