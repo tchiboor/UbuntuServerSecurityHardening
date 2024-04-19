@@ -10,7 +10,7 @@ install_dependencies() {
     pkgs=("figlet" "fail2ban" "libpam-pwquality" "net-tools" "rkhunter")
 
     for pkg in "${pkgs[@]}"; do
-        if ! apt install -y "$pkg" >> "$LOG_FILE" 2>&1; then
+        if ! DEBIAN_FRONTEND=noninteractive apt install -y "$pkg" >> "$LOG_FILE" 2>&1; then
             log "${RED}Error installing $pkg. Check log file for details.${NC}"
             exit 1
         fi
