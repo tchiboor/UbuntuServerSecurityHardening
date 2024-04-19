@@ -1,17 +1,15 @@
-disable_scp() {
-    log "${BLUE}Disabling scp ${NC}"
+disable_sftp_and_scp() {
+    log "${BLUE}Disabling SFTP and SCP.${NC}"
 
-    dd if=/dev/zero of=/usr/tmpDSK bs=1024 count=1024000 >> "$LOG_FILE" 2>&1
     # Backup the sshd_config file
     cp /etc/ssh/sshd_config /etc/ssh/sshd_config_backup >> "$LOG_FILE" 2>&1
 
-    # Disable SCP by appending configuration to the sshd_config file
-    bash -c 'echo -e "\n# Disable SCP\nSubsystem sftp /bin/false\n" >> /etc/ssh/sshd_config' >> "$LOG_FILE" 2>&1
+    # Disable SFTP and SCP by appending configuration to the sshd_config file
+    echo -e "\n# Disable SFTP and SCP\n" >> /etc/ssh/sshd_config
+    echo "Subsystem sftp /bin/false" >> /etc/ssh/sshd_config
+    echo "PermitSCP no" >> /etc/ssh/sshd_config
 
-    # Restart SSH service to apply changes
-    systemctl restart ssh >> "$LOG_FILE" 2>&1
-
-    log "${BLUE}Disabling scp: ${GREEN}DONE${NC}"
-    echo -e "${BLUE}Disabling scp: ${GREEN}DONE${NC}" >> report.txt
+    log "${BLUE}Disabling SFTP and SCP: ${GREEN}DONE${NC}"
+    echo -e "${BLUE}Disabling SFTP and SCP: ${GREEN}DONE${NC}" >> report.txt
 }
 
