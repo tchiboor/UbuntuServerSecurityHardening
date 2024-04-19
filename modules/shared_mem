@@ -5,7 +5,7 @@ shared_mem (){
 
 
 log "${BLUE}Adding 'tmpfs /run/shm tmpfs defaults,noexec,nosuid 0 0' to /etc/fstab ${NC}"
-echo 'tmpfs /run/shm tmpfs defaults,noexec,nosuid 0 0' >>  /etc/fstab
+echo 'tmpfs /run/shm tmpfs defaults,noexec,nosuid, rw 0 0' >>  /etc/fstab >> "$LOG_FILE" 2>&1
 
 if [ $? -ne 0 ]; then
     log "${BLUE}Failed to secure the shared memory: ${RED}FAILED ${NC}" 

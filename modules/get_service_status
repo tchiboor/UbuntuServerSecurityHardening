@@ -1,7 +1,7 @@
 # Function to get service statust
 get_service_status(){
-    echo -e "${BLUE}Get all services status ${NC}"
-    log "`service --status-all`" >> all_services_status.txt
-    log "${BLUE}Get all services status: ${GREEN}DONE${NC}"
-    echo -e "${BLUE}Get all services status: ${GREEN}DONE${NC}" >> report.txt
+    echo -e "${BLUE}Get running services status ${NC}"
+    service --status-all | grep '\[ + \]' >> running_services_status.txt
+    log "${BLUE}Get running services status: ${GREEN}DONE. CHECK running_services_status.txt ${NC}"
+    echo -e "${BLUE}Get running services status: ${GREEN}DONE. CHECK running_services_status.txt ${NC}" >> report.txt
 }

@@ -3,20 +3,15 @@ rkhunter_scan() {
     # Perform rkhunter scan
     log "${BLUE}Starting rkhunter scan ${NC}"
     if rkhunter --check --sk >> "$LOG_FILE" 2>&1; then
-        # Check if there are any warnings in the log file
-        if grep -q "Warning" "/var/log/rkhunter.log"; then
-            # Warnings found
-            RKHUNTER_LOG="/var/log/rkhunter.log"
-            cp "$RKHUNTER_LOG" . >> "$LOG_FILE" 2>&1
-            message="${BLUE}rkhunter scan completed with warnings. Review rkhunter logs for details: ${ORANGE}CHECK rkhunter.log  ${NC}"
-        else
-            # No warnings found
-            message="${BLUE}rkhunter scan completed. No rootkits or suspicious files found: ${GREEN}DONE ${NC}."
-        fi
+        RKHUNTER_LOG="/var/log/rkhunter.log"
+        cp "$RKHUNTER_LOG" . >> "$LOG_FILE" 2>&1
+        message="${BLUE}rkhunter scan completed with warnings. Review rkhunter logs for details: ${ORANGE}CHECK rkhunter.log  ${NC}"
+        log "$message"
+    echo -e "$message" >> report.txt
     else
         # rkhunter failed to run
         message="${RED}Failed to run rkhunter. Please check the system and try again.${NC}"
+        log "$message"
+        echo -e "$message" >> report.txt
     fi
-    log "$message"
-    echo -e "$message" >> report.txt
 }
