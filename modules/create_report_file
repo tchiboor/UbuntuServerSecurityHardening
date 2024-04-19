@@ -1,12 +1,13 @@
 # Report file
 create_report_file() {
-    log "${BLUE}Creating text file for the report${NC}"
-    
+    REPORT="report.txt"
+
     # Attempt to create the report file
-    if touch report.txt; then
-        REPORT="report.txt"
-        figlet "Security Hardening Report" >> "$REPORT" 2>> "$LOG_FILE" || log "${RED}Error creating report. Check log file${NC}"
-        log "${BLUE}Reporting file created: ${GREEN}DONE${NC}. File name: $REPORT"
+    if touch "$REPORT"; then
+        log "${BLUE}Creating text file for the report${NC}"
+        figlet "Security Hardening Report" >> "$REPORT" 2>> "$LOG_FILE" && \
+            log "${BLUE}Reporting file created: ${GREEN}DONE${NC}. File name: $REPORT" || \
+            log "${RED}Error creating report content. Check log file${NC}"
     else
         log "${RED}Error creating report file${NC}"
     fi
