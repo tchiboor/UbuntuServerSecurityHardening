@@ -1,10 +1,20 @@
 # Function to install dependencies
 install_dependencies() {
+    if ! command -v apt &> /dev/null; then
+        log "${RED}Error: apt command not found. Make sure your system is using APT package manager.${NC}"
+        exit 1
+    fi
+
     log "${BLUE}Installing dependencies${NC}"
-    apt install -y figlet >> "$LOG_FILE" 2>&1 || log "${RED}Error installing figlet. Check log file${NC}"
-    apt install -y fail2ban >> "$LOG_FILE" 2>&1 || log "${RED}Error installing fail2ban. Check log file${NC}"
-    apt install -y libpam-pwquality >> "$LOG_FILE" 2>&1 || log "${RED}Error installing libpam-pwquality. Check log file${NC}"
-    apt install -y net-tools >> "$LOG_FILE" 2>&1 || log "${RED}Error installing net-tools. Check log file${NC}"
-    DEBIAN_FRONTEND=noninteractive apt install -y rkhunter >> "$LOG_FILE" 2>&1 || log "${RED}Error installing rkhunter. Check log file ${NC}"
+
+    pkgs=("figlet" "fail2ban" "libpam-pwquality" "net-tools" "rkhunter")
+
+    for pkg in "${pkgs[@]}"; do
+        if ! apt install -y "$pkg" >> "$LOG_FILE" 2>&1; then
+            log "${RED}Error installing $pkg. Check log file for details.${NC}"
+            exit 1
+        fi
+    done
+
     log "${BLUE}Installing dependencies: ${GREEN}DONE${NC}"
 }

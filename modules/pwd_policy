@@ -23,18 +23,6 @@ else
     echo -e "${BLUE}Successfully updated /etc/pam.d/common-password: ${GREEN}DONE ${NC}" >> report.txt
 fi
 
-install password quality checking library
-log "${BLUE}installing libpam-pwquality ${NC}"
-
-if [ $? -ne 0 ]; then
-    echo "${RED}Failed to install libpam-pwquality ${NC}" 
-    echo "Failed to install libpam-pwquality" >> report.txt
-else
-    echo "${GREEN}Successfully installed libpam-pwquality ${NC}" 
-    echo "Successfully uinstalled libpam-pwquality " >> report.txt
-fi
-
-
 # set requirement for at least one uppercase (ucredit) at least one lowercase (lcredit), at least one digit (dcredit) and at least one special char (ocredit)
 log "${BLUE}Setting password complexity requirements (uppercase, lowercase, digit, and special char ${NC}"
 sed -i '/^password.*requisite/ s/pam_deny.so/pam_pwquality.so retry=3 lcredit=-1 ucredit=-1 dcredit=-1 ocredit=-1/' /etc/pam.d/common-password >> "$LOG_FILE" 2>&1
