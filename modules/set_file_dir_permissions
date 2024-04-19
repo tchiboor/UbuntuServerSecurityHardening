@@ -1,39 +1,45 @@
-# Function to set ownership and permissions for cron-related files and directories
 set_file_dir_permissions() {
     echo -e "${BLUE}Configuring files and directory permissions.${NC}"
-    
-    # Set ownership and permissions for /etc/crontab
-    chown root:root /etc/crontab >> "$LOG_FILE" 2>&1
-    chmod og-rwx /etc/crontab >> "$LOG_FILE" 2>&1
 
-    # Set ownership and permissions for /etc/cron.hourly
-    chown root:root /etc/cron.hourly >> "$LOG_FILE" 2>&1
-    chmod og-rwx /etc/cron.hourly >> "$LOG_FILE" 2>&1
+    # Directories and their corresponding permissions
+    directories=(
+        "/etc/crontab:700"
+        "/etc/cron.hourly:700"
+        "/etc/cron.daily:700"
+        "/etc/cron.weekly:700"
+        "/etc/cron.monthly:700"
+        "/etc/cron.d:700"
+        "/var/spool/cron:700"
+    )
 
-    # Set ownership and permissions for /etc/cron.daily
-    chown root:root /etc/cron.daily >> "$LOG_FILE" 2>&1
-    chmod og-rwx /etc/cron.daily >> "$LOG_FILE" 2>&1
+    # Files and their corresponding permissions
+    files=(
+        "/etc/passwd:644"
+        "/etc/shadow:600"
+        "/etc/group:644"
+        "/etc/sudoers:440"
+        "/etc/ssh/sshd_config:600"
+        "/etc/hosts.allow:644"
+        "/etc/hosts.deny:644"
+    )
 
-    # Set ownership and permissions for /etc/cron.weekly
-    chown root:root /etc/cron.weekly >> "$LOG_FILE" 2>&1
-    chmod og-rwx /etc/cron.weekly >> "$LOG_FILE" 2>&1
+    # Set permissions for directories
+    for dir in "${directories[@]}"; do
+        dir_path="${dir%%:*}"
+        permissions="${dir#*:}"
+        chown root:root "$dir_path" >> "$LOG_FILE" 2>&1
+        chmod "$permissions" "$dir_path" >> "$LOG_FILE" 2>&1 || { log "${RED}Error setting permissions for $dir_path.${NC}"; continue; }
+    done
 
-    # Set ownership and permissions for /etc/cron.monthly
-    chown root:root /etc/cron.monthly >> "$LOG_FILE" 2>&1
-    chmod og-rwx /etc/cron.monthly >> "$LOG_FILE" 2>&1
+    # Set permissions for files
+    for file in "${files[@]}"; do
+        file_path="${file%%:*}"
+        permissions="${file#*:}"
+        chmod "$permissions" "$file_path" >> "$LOG_FILE" 2>&1
+        chown root:root "$file_path" >> "$LOG_FILE" 2>&1 || { log "${RED}Error setting permissions for $file_path.${NC}"; continue; }
+    done
 
-    # Set ownership and permissions for /etc/cron.d
-    log "`chown root:root /etc/cron.d`"
-    log "`chmod og-rwx /etc/cron.d`"
-
-    # Set User/Group Owner and Permission on “passwd” file
-    log "`chmod 644 /etc/passwd`"
-    log "`chown root:root /etc/passwd`"
-
-    # Set User/Group Owner and Permission on the “shadow” file
-    log "`chmod 600 /etc/shadow`"
-    log "`chown root:root /etc/shadow`"
-
+    # Log success
     log "${BLUE}Configuring files/dir permissions: ${GREEN}DONE${NC}"
     echo -e "${BLUE}Configuring files/dir permissions: ${GREEN}DONE${NC}" >> report.txt
 }
