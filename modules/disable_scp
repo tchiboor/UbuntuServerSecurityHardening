@@ -1,15 +1,37 @@
 disable_scp() {
-    log "${BLUE}Disabling SFTP and SCP.${NC}"
+    log "${BLUE}Disabling SCP.${NC}"
 
     # Backup the sshd_config file
-    cp /etc/ssh/sshd_config /etc/ssh/sshd_config_backup >> "$LOG_FILE" 2>&1
+    cp /etc/ssh/sshd_config /etc/ssh/sshd_config_backup >> "$LOG_FILE" 2>&1 &&
 
     # Disable SFTP and SCP by appending configuration to the sshd_config file
-    echo -e "\n# Disable SFTP and SCP\n" >> /etc/ssh/sshd_config
-    echo "Subsystem sftp /bin/false" >> /etc/ssh/sshd_config
-    echo "PermitSCP no" >> /etc/ssh/sshd_config
+    # Deny access to the SCP binary
+    chmod 000 "$(which scp)" >> "$LOG_FILE" 2>&1 &&
 
-    log "${BLUE}Disabling SFTP and SCP: ${GREEN}DONE${NC}"
+    # Restart SSH service to apply changes
+    sudo systemctl restart ssh >> "$LOG_FILE" 2>&1 || {
+        log "${BLUE}Failed to restart SSH service.${NC}"
+    }
+
+    log "${BLUE}Disabling SCP: ${GREEN}DONE${NC}"
     echo -e "${BLUE}Disabling SFTP and SCP: ${GREEN}DONE${NC}" >> report.txt
 }
 
+disable_scp() {
+    log "${BLUE}Disabling SCP.${NC}"
+
+    # Backup the sshd_config file
+    cp /etc/ssh/sshd_config /etc/ssh/sshd_config_backup >> "$LOG_FILE" 2>&1 ||
+        { log "${RED}Disabling SCP: FAILED${NC}"; echo -e "${RED}Disabling SCP: FAILED${NC}" >> report.txt;}
+
+    # Deny access to the SCP binary
+    chmod 000 "$(which scp)" >> "$LOG_FILE" 2>&1 ||
+        { log "${RED}Disabling SCP: FAILED${NC}"; echo -e "${RED}Disabling SFTP and SCP: FAILED${NC}" >> report.txt;}
+
+    # Restart SSH service to apply changes
+    sudo systemctl restart ssh >> "$LOG_FILE" 2>&1 ||
+        { log "${RED}Failed to restart SSH service.${NC}"; echo -e "${RED}Disabling SCP: FAILED${NC}" >> report.txt; }
+
+    log "${BLUE}Disabling SCP: ${GREEN}DONE${NC}"
+    echo -e "${BLUE}Disabling SFTP and SCP: ${GREEN}DONE${NC}" >> report.txt
+}
