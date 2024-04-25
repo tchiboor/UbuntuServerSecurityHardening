@@ -44,6 +44,8 @@ set_file_dir_permissions
 disable_sudo_nopasswd
 disable_scp
 remove_nc
+remove_ruby
+remove_perl
 disable_compilers
 shared_mem
 ssh_noroot
