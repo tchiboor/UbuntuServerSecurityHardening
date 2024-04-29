@@ -2,12 +2,20 @@
 rkhunter_scan() {
     # Perform rkhunter scan
     log "${BLUE}Starting rkhunter scan ${NC}"
-    if rkhunter --check --sk >> "$LOG_FILE" 2>/dev/null; then
-        RKHUNTER_LOG="/var/log/rkhunter.log"
-        cp "$RKHUNTER_LOG" . >> "$LOG_FILE" 2>&1
-        message="${BLUE}rkhunter scan completed with warnings. Review rkhunter logs for details: ${ORANGE}CHECK rkhunter.log  ${NC}"
-        log "$message"
-    echo -e "$message" >> report.txt
+    if output=$(rkhunter --check --sk 2>&1); then
+    # Check if any warnings were encountered in the output
+        if grep -q "warnings have been found" <<< "$output"; then
+            # If warnings were found, log them
+            RKHUNTER_LOG="/var/log/rkhunter.log"
+            cp "$RKHUNTER_LOG" . >> "$LOG_FILE" 2>&1
+            log "${BLUE}rkhunter scan completed with WARNINGS. ${ORANGE} CHECK $RKHUNTER_LOG ${NC}"
+            log "$output" >> "$LOG_FILE"
+            echo -e "${BLUE}rkhunter scan completed with warnings. ${ORANGE} CHECK $RKHUNTER_LOG.${NC}" >> report.txt
+        else
+            # If no warnings were found, log success message
+            log "${BLUE}rkhunter scan completed successfully.${NC}"
+            echo -e "${BLUE}rkhunter scan completed successfully ${NC}" >> report.txt
+        fi
     else
         # rkhunter failed to run
         message="${RED}Failed to run rkhunter. Please check the system and try again.${NC}"
