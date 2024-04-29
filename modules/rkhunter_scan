@@ -2,7 +2,7 @@
 rkhunter_scan() {
     # Perform rkhunter scan
     log "${BLUE}Starting rkhunter scan ${NC}"
-    if rkhunter --check --sk >> "$LOG_FILE" 2>&1; then
+    if rkhunter --check --sk >> "$LOG_FILE" 2>/dev/null; then
         RKHUNTER_LOG="/var/log/rkhunter.log"
         cp "$RKHUNTER_LOG" . >> "$LOG_FILE" 2>&1
         message="${BLUE}rkhunter scan completed with warnings. Review rkhunter logs for details: ${ORANGE}CHECK rkhunter.log  ${NC}"
