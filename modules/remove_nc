@@ -1,39 +1,25 @@
 remove_nc() {
     log "${BLUE}Removing Netcat (nc) if installed ${NC}"
     
-    # Variable to track if any of the tools are found
-    found_tool=false
-    
-    # Check if nc is installed
-    if [ -x "$(command -v nc)" ]; then
-        # Uninstall nc
-        apt-get remove --purge -y netcat >> "$LOG_FILE" 2>&1
-        log "${BLUE}Removing nc: ${GREEN}DONE${NC}"
-        found_tool=true
-    fi
-    
-    # Check if ncat is installed
-    if [ -x "$(command -v ncat)" ]; then
-        # Uninstall ncat
-        apt-get remove --purge -y ncat >> "$LOG_FILE" 2>&1
-        log "${BLUE}Removing ncat: ${GREEN}DONE${NC}"
-        found_tool=true
-    fi
-    
-    # Check if netcat is installed
-    if [ -x "$(command -v netcat)" ]; then
-        # Uninstall netcat
-        apt-get remove --purge -y netcat >> "$LOG_FILE" 2>&1
-        log "${BLUE}Removing netcat: ${GREEN}DONE${NC}"
-        found_tool=true
-    fi
-    
-    # Check if none of the tools were found
-    if [ "$found_tool" = false ]; then
-        log "${BLUE}Netcat (nc) is not installed${NC}"
-        echo -e "${BLUE}Removing Netcat (nc): ${GREEN}DONE${NC}. ${ORANGE}Netcat NOT INSTALLED${NC}" >> report.txt
-    else
+    # Define netcat binaries
+    netcat_binaries=("nc" "netcat" "ncat")
+
+    # Loop through each netcat binary
+    for binary in "${netcat_binaries[@]}"
+    do
+        # Locate the binary
+        binary_path=$(which "$binary" 2>/dev/null)
+
+        # Check if the binary exists
+        if [ -n "$binary_path" ]
+        then
+            # If the binary exists, remove it
+            rm "$binary_path" >> "$LOG_FILE" 2>&1
+            log "Removed $binary"
+        else
+            log "$binary not found, skipping"
+        fi
+    done
         log "${BLUE}Removing Netcat (nc): ${GREEN}DONE${NC}"
         echo -e "${BLUE}Removing Netcat (nc): ${GREEN}DONE${NC}" >> report.txt
-    fi
 }

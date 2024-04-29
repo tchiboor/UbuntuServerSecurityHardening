@@ -14,17 +14,15 @@ pwd_policy() {
     fi
 
     # Set minimum length and password complexity requirements
-    log "${BLUE}Setting password requirements in PAM${NC}"
-    sed -i '/^password.*requisite/ s/pam_unix.so/pam_unix.so retry=3 minlen=8 ucredit=-1 lcredit=-1 dcredit=-1 ocredit=-1 remember=4/' /etc/pam.d/common-password >> "$LOG_FILE" 2>&1
+log "${BLUE}Setting password requirements in PAM${NC}"
 
-    if [ $? -ne 0 ]; then
-        log "${BLUE}Failed to edit /etc/pam.d/common-password: ${RED}FAILED ${NC}"
-        echo -e "${BLUE}Failed to edit /etc/pam.d/common-password: ${RED}FAILED ${NC}" >> report.txt
-
-    else
-        log "${BLUE}Successfully updated /etc/pam.d/common-password: ${GREEN}DONE${NC}"
-        echo -e "${BLUE}Successfully updated /etc/pam.d/common-password: ${GREEN}DONE${NC}" >> report.txt
-    fi
+if sed -i '/^password.*requisite/ s/pam_unix.so/pam_unix.so retry=3 minlen=8 ucredit=-1 lcredit=-1 dcredit=-1 ocredit=-1 remember=4/' /etc/pam.d/common-password >> "$LOG_FILE" 2>&1; then
+    log "${BLUE}Successfully updated /etc/pam.d/common-password: ${GREEN}DONE${NC}"
+    echo -e "${BLUE}Successfully updated /etc/pam.d/common-password: ${GREEN}DONE${NC}" >> report.txt
+else
+    log "${BLUE}Failed to edit /etc/pam.d/common-password: ${RED}FAILED ${NC}"
+    echo -e "${BLUE}Failed to edit /etc/pam.d/common-password: ${RED}FAILED ${NC}" >> report.txt
+fi
 
     # Set password expiry to 180 days and warning period to 14 days
     log "${BLUE}Setting password expiry and warning period${NC}"

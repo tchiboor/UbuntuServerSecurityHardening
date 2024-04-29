@@ -16,11 +16,7 @@ disable_compilers() {
             # If the compiler exists, remove it
             rm "$compiler_path" >> "$LOG_FILE" 2>&1
             log "Removed $compiler"
-            # Log the action
-            log "Removed $compiler"
         else
-            log "$compiler not found, skipping"
-            # Log the action
             log "$compiler not found, skipping"
         fi
     done
