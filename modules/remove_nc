@@ -1,15 +1,39 @@
 remove_nc() {
-    log "${BLUE}Removing nc ${NC}"
+    log "${BLUE}Removing Netcat (nc) if installed ${NC}"
+    
+    # Variable to track if any of the tools are found
+    found_tool=false
+    
     # Check if nc is installed
     if [ -x "$(command -v nc)" ]; then
         # Uninstall nc
         apt-get remove --purge -y netcat >> "$LOG_FILE" 2>&1
         log "${BLUE}Removing nc: ${GREEN}DONE${NC}"
-    echo -e "${BLUE}Removing nc: ${GREEN}DONE${NC}" >> report.txt
-    else
+        found_tool=true
+    fi
+    
+    # Check if ncat is installed
+    if [ -x "$(command -v ncat)" ]; then
+        # Uninstall ncat
+        apt-get remove --purge -y ncat >> "$LOG_FILE" 2>&1
+        log "${BLUE}Removing ncat: ${GREEN}DONE${NC}"
+        found_tool=true
+    fi
+    
+    # Check if netcat is installed
+    if [ -x "$(command -v netcat)" ]; then
+        # Uninstall netcat
+        apt-get remove --purge -y netcat >> "$LOG_FILE" 2>&1
+        log "${BLUE}Removing netcat: ${GREEN}DONE${NC}"
+        found_tool=true
+    fi
+    
+    # Check if none of the tools were found
+    if [ "$found_tool" = false ]; then
         log "${BLUE}Netcat (nc) is not installed${NC}"
-        echo -e "${BLUE}Removing nc: ${GREEN}DONE${NC}. ${ORANGE}Netcat NOT INSTALLED${NC}" >> report.txt
+        echo -e "${BLUE}Removing Netcat (nc): ${GREEN}DONE${NC}. ${ORANGE}Netcat NOT INSTALLED${NC}" >> report.txt
+    else
+        log "${BLUE}Removing Netcat (nc): ${GREEN}DONE${NC}"
+        echo -e "${BLUE}Removing Netcat (nc): ${GREEN}DONE${NC}" >> report.txt
     fi
 }
-
-
