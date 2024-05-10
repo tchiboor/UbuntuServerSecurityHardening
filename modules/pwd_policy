@@ -4,10 +4,10 @@ log "${BLUE}Creating a backup of /etc/pam.d/common-password ${NC}"
 cp /etc/pam.d/common-password /etc/pam.d/common-password.bak
 if [ $? -ne 0 ]; then
     echo "${RED}Failed to create a backup  ${NC}" 
-    echo "Failed to create a backup " > report.txt
+    echo "Failed to create a backup " >> report.txt
 else
     echo "${GREEN}Successfully created a backup${NC}" 
-    echo "Successfully created a backup" > report.txt
+    echo "Successfully created a backup" >> report.txt
 fi
 
 
@@ -16,10 +16,10 @@ log "${BLUE}installing libpam-pwquality ${NC}"
 apt install -y libpam-pwquality
 if [ $? -ne 0 ]; then
     echo "${RED}Failed to install libpam-pwquality ${NC}" 
-    echo "Failed to install libpam-pwquality" > report.txt
+    echo "Failed to install libpam-pwquality" >> report.txt
 else
     echo "${GREEN}Successfully installed libpam-pwquality ${NC}" 
-    echo "Successfully uinstalled libpam-pwquality " > report.txt
+    echo "Successfully uinstalled libpam-pwquality " >> report.txt
 fi
 
 
@@ -28,10 +28,10 @@ log "${BLUE}Commenting out all lines of /etc/pam.d/common-password ${NC}"
 sed -i "s/^/#/" /etc/pam.d/common-password
 if [ $? -ne 0 ]; then
     echo "${RED}Failed to comment out all lines  ${NC}" 
-    echo "Failed to comment out all lines " > report.txt
+    echo "Failed to comment out all lines " >> report.txt
 else
     echo "${GREEN}Successfully commented out all lines${NC}" 
-    echo "Successfully commented out all lines" > report.txt
+    echo "Successfully commented out all lines" >> report.txt
 fi
 
 
@@ -40,10 +40,10 @@ log "${BLUE}Setting minimum length 8 and setting anti password reuse policy${NC}
 echo 'password    [success=ok default=die]    pam_unix.so obscure yescrypt minlen=8 remember=5 enforce_for_root' >> /etc/pam.d/common-password
 if [ $? -ne 0 ]; then
     echo "${RED}Failed to add directive 1  ${NC}" 
-    echo "Failed to add directive 1  " > report.txt
+    echo "Failed to add directive 1  " >> report.txt
 else
     echo "${GREEN}Successfully added directive 1 ${NC}" 
-    echo "Successfully added directive 1 " > report.txt
+    echo "Successfully added directive 1 " >> report.txt
 fi
 
 
@@ -52,10 +52,10 @@ log "${BLUE}Setting password complexity requirements (uppercase, lowercase, digi
 echo 'password    requisite    pam_pwquality.so retry=3 lcredit=-1 ucredit=-1 dcredit=-1 ocredit=-1 enforce_for_root' >> /etc/pam.d/common-password
 if [ $? -ne 0 ]; then
     echo "${RED}Failed to add directive 2  ${NC}" 
-    echo "Failed to add directive 2  " > report.txt
+    echo "Failed to add directive 2  " >> report.txt
 else
     echo "${GREEN}Successfully added directive 2 ${NC}" 
-    echo "Successfully added directive 2 " > report.txt
+    echo "Successfully added directive 2 " >> report.txt
 fi
 
 
@@ -65,10 +65,10 @@ log "${BLUE}Adding last directive (default){NC}"
 echo 'password    required    pam_permit.so' >> /etc/pam.d/common-password
 if [ $? -ne 0 ]; then
     echo "${RED}Failed to add directive 3  ${NC}" 
-    echo "Failed to add directive 3  " > report.txt
+    echo "Failed to add directive 3  " >> report.txt
 else
     echo "${GREEN}Successfully added directive 3 ${NC}" 
-    echo "Successfully added directive 3 " > report.txt
+    echo "Successfully added directive 3 " >> report.txt
 fi
 
 
@@ -79,10 +79,10 @@ sed -i '/^PASS_MAX_DAYS/ s/^.*$/PASS_MAX_DAYS   185/' /etc/login.defs
 sed -i '/^PASS_WARN_AGE/ s/^.*$/PASS_WARN_AGE   30/' /etc/login.defs
 if [ $? -ne 0 ]; then
     echo "${RED}Failed to edit /etc/login.defs${NC}" 
-    echo "Failed to edit /etc/login.defs" > report.txt
+    echo "Failed to edit /etc/login.defs" >> report.txt
 else
     echo "${GREEN}Successfully updated /etc/login.defs${NC}" 
-    echo "Successfully updated /etc/login.defs" > report.txt
+    echo "Successfully updated /etc/login.defs" >> report.txt
 fi
 
 
